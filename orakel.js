@@ -41,7 +41,7 @@ function processPrivate(message, from) {
 			case 'ping':
 				return { sendPublic: false, text: 'pong' };
 			case '?':
-				return { sendPublic: false, text: 'Öffentlich: lima-city?, hilfe?, zip?, ftp?, mysql?, pma?, filemanager?, subdomain?, auktion?, ticket?, phpinfo?, metafrage?' };
+				return { sendPublic: false, text: 'Öffentlich: lima-city?, hilfe?, zip?, ftp?, mysql?, pma?, filemanager?, subdomain?, auktion?, ticket?, phpinfo?, paste?, metafrage?' };
 		}
 	} else if(parts.length > 1) {
 		switch(parts[0]) {
@@ -50,6 +50,9 @@ function processPrivate(message, from) {
 					sendPublic: true,
 					text: message.substring(message.indexOf('say') + 4).trim()
 				};
+			case 'merke':
+				remembered = msg.substring(parts[0].length + 1).trim();
+				return null;
 		}
 	}
 	return null;
@@ -67,8 +70,16 @@ function process(message, from) {
 			return 'Nein';
 		if(/^(wer|was) bist du\??$/i.test(msg))
 			return 'das Orakel';
+		if(/^was machst du\??$/i.test(msg))
+			return 'existieren';
+		if(/^wer ist dein meister\??$/i.test(msg))
+			return '/me hat keinen Meister';
 		if(/^ist das schlimm\??$/i.test(msg))
 			return oneof(['ja', 'nein', 'vielleicht', 'möglicherweise']);
+		if(/^stimmt das\??$/i.test(msg))
+			return oneof(['ja', 'nein']);
+		if(/^ist das falsch\??/i.test(msg))
+			return oneof(['nein', 'ja']);
 
 		var parts = msg.split(' ');
 		if(parts.length == 1) {
@@ -97,6 +108,8 @@ function process(message, from) {
 					return 'https://www.lima-city.de/usercp/tickets/';
 				case 'phpinfo?':
 					return 'http://system.lima-city.de/info.php';
+				case 'paste?':
+					return 'http://paste42.de/';
 				case 'metafrage?':
 				case 'metaquestion?':
 					return '„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“';
@@ -194,6 +207,8 @@ function process(message, from) {
 			return '\\o\\';
 		} else if(message == 'o-') {
 			return '-o';
+		} else if(message == '_o/') {
+			return '\\o_';
 		}
 	}
 	return null;
