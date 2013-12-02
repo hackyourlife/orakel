@@ -10,6 +10,7 @@ function oneof(list) {
 
 var capslocked = {};
 var capscleared = {};
+var lasthands = 0;
 
 function clearCapsLocked(from) {
 	if(capslocked[from] !== undefined)
@@ -52,6 +53,9 @@ function processPrivate(message, from) {
 				};
 			case 'merke':
 				remembered = msg.substring(parts[0].length + 1).trim();
+				return null;
+			case 'hands':
+				config.hands = parts[1] == 'on';
 				return null;
 		}
 	}
@@ -110,6 +114,8 @@ function process(message, from) {
 					return 'http://system.lima-city.de/info.php';
 				case 'paste?':
 					return 'http://paste42.de/';
+				case 'status?':
+					return 'http://lima-status.de/';
 				case 'metafrage?':
 				case 'metaquestion?':
 					return '„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“';
@@ -117,6 +123,12 @@ function process(message, from) {
 					return remembered;
 				case 'hä?':
 					return 'Wos is?';
+				case 'aus!':
+					config.hands = false;
+					return 'ok';
+				case 'nerv!':
+					config.hands = true;
+					return ':)';
 				case 'hallo':
 				case 'moin':
 				case 'hi':
@@ -182,6 +194,7 @@ function process(message, from) {
 		}
 		*/
 
+		var delta = (Date.now() - lasthands) / 1000;
 		// questions
 		if(message.indexOf('?') !== -1) {
 			var metaquestion = /wer (von euch )?kennt sich.* mit .* aus|(jemand|wer) (hier|da).* der sich (mit .* auskennt|auskennt mit)|kennt sich(hier )? wer mit .* aus/gi;
@@ -202,13 +215,18 @@ function process(message, from) {
 		} else if(message.toLowerCase() == 'ping') {
 			return 'pong';
 		} else if(message == '\\o/') {
-			return '\\o/';
-		} else if(message == '/o/') {
-			return '\\o\\';
-		} else if(message == 'o-') {
-			return '-o';
-		} else if(message == '_o/') {
-			return '\\o_';
+			lasthands = Date.now();
+			if(delta > config.handsgrace)
+				return '\\o/';
+			return null;
+		} else if(config.hands) {
+			if(message == '/o/') {
+				return '\\o\\';
+			} else if(message == 'o-') {
+				return '-o';
+			} else if(message == '_o/') {
+				return '\\o_';
+			}
 		}
 	}
 	return null;

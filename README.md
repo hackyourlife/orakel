@@ -8,7 +8,7 @@ Konfiguration
 =============
 ```js
 var config = {
-	jid: 'username@jabber.lima-city.de/bot',
+	jid: 'username@jabber.lima-city.de/orakel',
 	password: 'password',
 	room_jid: 'support@conference.jabber.lima-city.de',
 	room_nick: 'Orakel'
