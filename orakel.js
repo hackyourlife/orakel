@@ -126,7 +126,7 @@ function process(message, from) {
 				case 'aus!':
 					config.hands = false;
 					return 'ok';
-				case 'nerv!':
+				case 'fass!':
 					config.hands = true;
 					return ':)';
 				case 'hallo':
@@ -147,6 +147,9 @@ function process(message, from) {
 					break;
 				case 'sag':
 					return msg.substring(parts[0].length + 1).trim();
+				case 'Du':
+				case 'du':
+					return 'nein, ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
 				case 'stinkt':
 					return 'nein';
 			}
@@ -199,7 +202,10 @@ function process(message, from) {
 		if(message.indexOf('?') !== -1) {
 			var metaquestion = /wer (von euch )?kennt sich.* mit .* aus|(jemand|wer) (hier|da).* der sich (mit .* auskennt|auskennt mit)|kennt sich(hier )? wer mit .* aus/gi;
 			var alive = /^((hi|hallo) )?(ist )?(gerade )?(wer|jemand|irgendwer) (da|hier)$/i;
-			var mysql = /^wo finde ich meine mysql[ -](zugangs)?daten|^wo sehe ich die daten für MySQL|^wie komme? ich auf meine mysql/gi;
+			var mysql = /^wo finde ich (die|meine) mysql[ -](zugangs)?daten|^wo sehe ich die daten für MySQL|^wie komme? ich (hier )?auf meine mysql/gi;
+			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde/gi;
+			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo der file-?manager (hin(gekommen)?|zu finden) ist/gi;
+			var ftp = /^(wie|wo) (bekommt|findet) man (die|seine) ftp[- ](zugangs-?)?daten|(wie|wo) (bekomme|finde) ich (meine|die) ftp[- ](zugangs-?)?daten/gi;
 			var understand = false;
 			var questions = message.split('?');
 			for(var i = 0; i < questions.length; i++) {
@@ -208,19 +214,25 @@ function process(message, from) {
 					return '„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“';
 				} else if(mysql.test(question)) {
 					return 'Die Zugangsdaten zum MySQL-Server findest du unter https://www.lima-city.de/usercp/databases';
+				} else if(filemanager.test(question)) {
+					return 'Den lima-city-Filemanager findest du unter http://filemanager.lima-city.de/';
+				} else if(ftp.test(question)) {
+					return 'Deine FTP-Zugangsdaten findest du unter https://www.lima-city.de/usercp/ftp';
+				} else if(pma.test(question)) {
+					return 'PHPMyAdmin findest du unter http://mysql.lima-city.de/';
 				} else if(alive.test(question)) {
 					return 'nein';
 				}
 			}
 		} else if(message.toLowerCase() == 'ping') {
 			return 'pong';
-		} else if(message == '\\o/') {
-			lasthands = Date.now();
-			if(delta > config.handsgrace)
-				return '\\o/';
-			return null;
 		} else if(config.hands) {
-			if(message == '/o/') {
+			if(message == '\\o/') {
+				lasthands = Date.now();
+				if(delta > config.handsgrace)
+					return '\\o/';
+				return null;
+			} else if(message == '/o/') {
 				return '\\o\\';
 			} else if(message == 'o-') {
 				return '-o';
@@ -318,7 +330,7 @@ cl.on('stanza', function(stanza) {
 		params.to = config.room_jid;
 		params.type = 'groupchat';
 		// mentation?
-		if(message.substring(0, config.room_nick.length) == config.room_nick) {
+		if(isMentation(message)) {
 			response = stanza.attrs.from.substring(config.room_jid.length + 1)
 				+ ': ' + response;
 		}
