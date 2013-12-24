@@ -11,6 +11,7 @@ function oneof(list) {
 var capslocked = {};
 var capscleared = {};
 var lasthands = 0;
+var lastgreet = 0;
 
 function clearCapsLocked(from) {
 	if(capslocked[from] !== undefined)
@@ -42,7 +43,14 @@ function processPrivate(message, from) {
 			case 'ping':
 				return { sendPublic: false, text: 'pong' };
 			case '?':
-				return { sendPublic: false, text: 'Öffentlich: lima-city?, hilfe?, zip?, ftp?, mysql?, pma?, filemanager?, subdomain?, auktion?, ticket?, phpinfo?, paste?, metafrage?' };
+				return { sendPublic: false, text: 'Öffentlich: ' +
+					['lima-city', 'hilfe', 'formate', 'inhalte',
+					'zip', 'ftp', 'mysql', 'pma', 'phpmyadmin',
+					'filemanager', 'subdomain', 'subdomains', 'domain',
+					'domains', 'regeln', 'werbefreiheit', 'rollen',
+					'zahlungsmittel', 'webspace', 'download', 'auktion',
+					'ticket', 'phpinfo', 'paste', 'status', 'metafrage',
+					'metaquestion'].join(', ') };
 		}
 	} else if(parts.length > 1) {
 		switch(parts[0]) {
@@ -85,9 +93,23 @@ function process(message, from) {
 		if(/^ist das falsch\??/i.test(msg))
 			return oneof(['nein', 'ja']);
 
+		var questions = ['lima-city', 'hilfe', 'formate', 'inhalte',
+			'zip', 'ftp', 'mysql', 'pma', 'phpmyadmin',
+			'filemanager', 'subdomain', 'subdomains', 'domain',
+			'domains', 'regeln', 'werbefreiheit', 'rollen',
+			'zahlungsmittel', 'webspace', 'download', 'auktion',
+			'ticket', 'phpinfo', 'paste', 'status', 'metafrage',
+			'metaquestion'];
 		var parts = msg.split(' ');
 		if(parts.length == 1) {
-			switch(parts[0]) {
+			var command = parts[0];
+			for(var i = 0; i < questions.length; i++) {
+				if(command == questions[i]) {
+					command += '?';
+					break;
+				}
+			}
+			switch(command) {
 				case 'lima-city?':
 					return 'https://www.lima-city.de/';
 				case 'hilfe?':
@@ -101,11 +123,28 @@ function process(message, from) {
 				case 'mysql?':
 					return 'https://www.lima-city.de/usercp/databases';
 				case 'pma?':
+				case 'phpmyadmin?':
 					return 'http://mysql.lima-city.de/';
 				case 'filemanager?':
 					return 'http://filemanager.lima-city.de/';
 				case 'subdomain?':
+				case 'subdomains?':
 					return 'https://www.lima-city.de/usercp/subdomains';
+				case 'domain?':
+				case 'domains?':
+					return 'https://www.lima-city.de/usercp/domains';
+				case 'regeln?':
+					return 'https://www.lima-city.de/2008/help#tabRules';
+				case 'werbefreiheit?':
+					return 'https://www.lima-city.de/2008/werbefreiheit';
+				case 'rollen?':
+					return 'https://www.lima-city.de/2008/rollen';
+				case 'zahlungsmittel?':
+					return 'https://www.lima-city.de/2008/zahlungsmittel';
+				case 'webspace?':
+					return 'https://www.lima-city.de/2008/webspace';
+				case 'download?':
+					return 'https://www.lima-city.de/2008/download';
 				case 'auktion?':
 					return 'https://www.lima-city.de/auctions';
 				case 'ticket?':
@@ -125,7 +164,7 @@ function process(message, from) {
 					return 'Wos is?';
 				case 'aus!':
 					config.hands = false;
-					return 'ok';
+					return ':(';
 				case 'fass!':
 					config.hands = true;
 					return ':)';
@@ -134,6 +173,7 @@ function process(message, from) {
 				case 'hi':
 				case 'hai':
 				case 'servus':
+				case 'huhu':
 					return 'hallo';
 				case 'stinkt':
 					return 'nein';
@@ -149,7 +189,7 @@ function process(message, from) {
 					return msg.substring(parts[0].length + 1).trim();
 				case 'Du':
 				case 'du':
-					return 'nein, ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
+					return 'nein ' + getNick(from) + ', ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
 				case 'stinkt':
 					return 'nein';
 			}
@@ -157,14 +197,16 @@ function process(message, from) {
 		}
 	} else {
 		// greet - self
-		var greetings = [ 'hallo', 'moin', 'hi', 'hai', 'servus', 'aloha' ];
+		var greetings = [ 'hallo', 'moin', 'hi', 'hai', 'servus', 'aloha', 'huhu' ];
 		var greet = false;
+		var deltagreet = (Date.now() - lastgreet) / 1000;
 		for(var i = 0; i < greetings.length; i++) {
 			if(message.toLowerCase() == greetings[i] + ' ' + config.room_nick.toLowerCase())
 				greet = true;
 		}
-		if(greet) {
-			return 'hi';
+		if(greet && (deltagreet > config.greetgrace)) {
+			lastgreet = Date.now();
+			return oneof(['hi', 'hai', 'hallo', 'huhu']);
 		}
 
 		// caps
@@ -204,7 +246,7 @@ function process(message, from) {
 			var alive = /^((hi|hallo) )?(ist )?(gerade )?(wer|jemand|irgendwer) (da|hier)$/i;
 			var mysql = /^wo finde ich (die|meine) mysql[ -](zugangs)?daten|^wo sehe ich die daten für MySQL|^wie komme? ich (hier )?auf meine mysql/gi;
 			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde/gi;
-			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo der file-?manager (hin(gekommen)?|zu finden) ist/gi;
+			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo (der file-?manager (hin(gekommen)?|zu finden) ist|ich den file-?manager finde)/gi;
 			var ftp = /^(wie|wo) (bekommt|findet) man (die|seine) ftp[- ](zugangs-?)?daten|(wie|wo) (bekomme|finde) ich (meine|die) ftp[- ](zugangs-?)?daten/gi;
 			var understand = false;
 			var questions = message.split('?');
@@ -251,6 +293,10 @@ function isMentation(message) {
 			return true;
 	}
 	return false;
+}
+
+function getNick(from) {
+	return from.substring(config.room_jid.length + 1);
 }
 
 var cl = new xmpp.Client({
@@ -330,10 +376,10 @@ cl.on('stanza', function(stanza) {
 		params.to = config.room_jid;
 		params.type = 'groupchat';
 		// mentation?
-		if(isMentation(message)) {
-			response = stanza.attrs.from.substring(config.room_jid.length + 1)
-				+ ': ' + response;
-		}
+		//if(isMentation(message)) {
+		//	response = stanza.attrs.from.substring(config.room_jid.length + 1)
+		//		+ ': ' + response;
+		//}
 	} else {
 		params.to = stanza.attrs.from;
 		params.type = 'chat';
