@@ -28,7 +28,7 @@ paste;http://paste42.de/
 status;http://lima-status.de/
 metafrage;„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“
 pidgin;https://www.pidgin.im/
-/help;https://github.com/hackyourlife/orakel/blob/master/messages.csv
-help;https://github.com/hackyourlife/orakel/blob/master/messages.csv
+/help;https://github.com/hackyourlife/orakel/blob/master/help.md
+help;https://github.com/hackyourlife/orakel/blob/master/help.md
 a;b
 abc;def
