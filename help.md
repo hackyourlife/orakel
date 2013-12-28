@@ -30,3 +30,9 @@ ist.
 * `ping`: Das Orakel antwortet mit `pong`
 * `\o/`, `/o/`, `\o\`, `o-`, `_o/`: was eben dazu gehört
 * manche Fragen werden direkt beantwortet
+
+Privater Chat
+-------------
+
+* `?`: Liste aller geladenen Fragen wird ausgegeben
+* `ping` → `pong`
