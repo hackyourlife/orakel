@@ -1,3 +1,5 @@
+#!/bin/node
+
 var util = require('util');
 var fs = require('fs');
 var xmpp = require('node-xmpp');
@@ -12,6 +14,27 @@ var capslocked = {};
 var capscleared = {};
 var lasthands = 0;
 var lastgreet = 0;
+var knownquestions = {};
+var questionlist = [];
+
+function readMessages(file) {
+	var data = fs.readFileSync(file).toString().split('\n');
+	for(var i = 0; i < data.length; i++) {
+		var line = data[i].trim();
+		if(line.length < 3)
+			continue;
+		var x = line.indexOf(';');
+		if(x == -1)
+			continue;
+		var question = line.substring(0, x).trim();
+		var response = line.substring(x + 1).trim();
+		knownquestions[question] = response;
+		questionlist.push(question);
+	}
+	util.log(questionlist.length + ' questions loaded');
+}
+
+readMessages('messages.csv');
 
 function clearCapsLocked(from) {
 	if(capslocked[from] !== undefined)
@@ -44,13 +67,7 @@ function processPrivate(message, from) {
 				return { sendPublic: false, text: 'pong' };
 			case '?':
 				return { sendPublic: false, text: 'Öffentlich: ' +
-					['lima-city', 'hilfe', 'formate', 'inhalte',
-					'zip', 'ftp', 'mysql', 'pma', 'phpmyadmin',
-					'filemanager', 'subdomain', 'subdomains', 'domain',
-					'domains', 'regeln', 'werbefreiheit', 'rollen',
-					'zahlungsmittel', 'webspace', 'download', 'auktion',
-					'ticket', 'phpinfo', 'paste', 'status', 'metafrage',
-					'metaquestion'].join(', ') };
+					questionlist.join(', ') };
 		}
 	} else if(parts.length > 1) {
 		switch(parts[0]) {
@@ -87,78 +104,22 @@ function process(message, from) {
 		if(/^wer ist dein meister\??$/i.test(msg))
 			return '/me hat keinen Meister';
 		if(/^ist das schlimm\??$/i.test(msg))
-			return oneof(['ja', 'nein', 'vielleicht', 'möglicherweise']);
+			return oneof(['ja', 'nein', 'vielleicht']);
 		if(/^stimmt das\??$/i.test(msg))
 			return oneof(['ja', 'nein']);
 		if(/^ist das falsch\??/i.test(msg))
 			return oneof(['nein', 'ja']);
 
-		var questions = ['lima-city', 'hilfe', 'formate', 'inhalte',
-			'zip', 'ftp', 'mysql', 'pma', 'phpmyadmin',
-			'filemanager', 'subdomain', 'subdomains', 'domain',
-			'domains', 'regeln', 'werbefreiheit', 'rollen',
-			'zahlungsmittel', 'webspace', 'download', 'auktion',
-			'ticket', 'phpinfo', 'paste', 'status', 'metafrage',
-			'metaquestion'];
 		var parts = msg.split(' ');
 		if(parts.length == 1) {
-			var command = parts[0];
-			for(var i = 0; i < questions.length; i++) {
-				if(command == questions[i]) {
-					command += '?';
-					break;
-				}
-			}
+			var command = parts[0].toLowerCase();
+			if(command.charAt(command.length - 1) == '?')
+				command = command.substring(0, command.length - 1)
+			if(knownquestions[command] !== undefined)
+				return knownquestions[command];
 			switch(command) {
-				case 'lima-city?':
-					return 'https://www.lima-city.de/';
-				case 'hilfe?':
-					return 'https://www.lima-city.de/2008/help';
-				case 'formate?':
-				case 'inhalte?':
-				case 'zip?':
-					return 'https://www.lima-city.de/2008/speicherplatz#inhalte';
-				case 'ftp?':
-					return 'https://www.lima-city.de/usercp/ftp';
-				case 'mysql?':
-					return 'https://www.lima-city.de/usercp/databases';
-				case 'pma?':
-				case 'phpmyadmin?':
-					return 'http://mysql.lima-city.de/';
-				case 'filemanager?':
-					return 'http://filemanager.lima-city.de/';
-				case 'subdomain?':
-				case 'subdomains?':
-					return 'https://www.lima-city.de/usercp/subdomains';
-				case 'domain?':
-				case 'domains?':
-					return 'https://www.lima-city.de/usercp/domains';
-				case 'regeln?':
-					return 'https://www.lima-city.de/2008/help#tabRules';
-				case 'werbefreiheit?':
-					return 'https://www.lima-city.de/2008/werbefreiheit';
-				case 'rollen?':
-					return 'https://www.lima-city.de/2008/rollen';
-				case 'zahlungsmittel?':
-					return 'https://www.lima-city.de/2008/zahlungsmittel';
-				case 'webspace?':
-					return 'https://www.lima-city.de/2008/webspace';
-				case 'download?':
-					return 'https://www.lima-city.de/2008/download';
-				case 'auktion?':
-					return 'https://www.lima-city.de/auctions';
-				case 'ticket?':
-					return 'https://www.lima-city.de/usercp/tickets/';
-				case 'phpinfo?':
-					return 'http://system.lima-city.de/info.php';
-				case 'paste?':
-					return 'http://paste42.de/';
-				case 'status?':
-					return 'http://lima-status.de/';
-				case 'metafrage?':
-				case 'metaquestion?':
-					return '„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“';
 				case 'sprich':
+				case 'sprich!':
 					return remembered;
 				case 'hä?':
 					return 'Wos is?';
@@ -345,7 +306,7 @@ cl.on('stanza', function(stanza) {
 		response = processPrivate(message, stanza.attrs.from);
 		if(response == null)
 			return;
-		console.log(stanza.attrs.from + ': "' + message + '" => "' + response.text + '"');
+		util.log(stanza.attrs.from + ': "' + message + '" => "' + response.text + '"');
 		var params = {};
 		if(response.sendPublic) {
 			params = {
@@ -368,7 +329,7 @@ cl.on('stanza', function(stanza) {
 	}
 	if(response === null)
 		return;
-	console.log('"' + message + '" => "' + response + '"');
+	util.log('"' + message + '" => "' + response + '"');
 
 	// is private
 	var params = {};
