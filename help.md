@@ -1,14 +1,14 @@
-Hilfe
-=====
+<!-- vim:set ft=markdown: -->
 
 Fragen
-------
+======
 
 Das Orakel beantwortet einige Fragen. Welche dies sind lässt sich der
-[Definition](https://github.com/hackyourlife/orakel/messages.csv) entnehmen.
+[Definition](https://github.com/hackyourlife/orakel/blob/master/messages.csv)
+entnehmen.
 
 Aktionen
---------
+========
 
 * `sag`: Das Orakel gibt den Text, der `sag` folgt aus. Aus `sag hallo` wird
   `hallo`.
@@ -22,7 +22,7 @@ Aktionen
 * `fass!`: Gegenteil von `aus!`
 
 Allgemeines
------------
+===========
 
 Das Orakel reagiert auf folgende Meldungen, denen nicht `Orakel` vorangestellt
 ist.
@@ -32,7 +32,7 @@ ist.
 * manche Fragen werden direkt beantwortet
 
 Privater Chat
--------------
+=============
 
 * `?`: Liste aller geladenen Fragen wird ausgegeben
 * `ping` → `pong`
