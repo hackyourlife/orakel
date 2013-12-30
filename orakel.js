@@ -10,10 +10,13 @@ function oneof(list) {
 	return list[Math.floor((Math.random() * list.length))];
 }
 
+config.abcgrace = 30;
+
 var capslocked = {};
 var capscleared = {};
 var lasthands = 0;
 var lastgreet = 0;
+var lastabc = 0;
 var knownquestions = {};
 var questionlist = [];
 
@@ -105,7 +108,7 @@ function process(message, from) {
 			return '/me hat keinen Meister';
 		if(/^ist das schlimm\??$/i.test(msg))
 			return oneof(['ja', 'nein', 'vielleicht']);
-		if(/^stimmt das\??$/i.test(msg))
+		if(/^stimmt das\??$/i.test(msg) || /^stimmt das[, ]/i.test(msg))
 			return oneof(['ja', 'nein']);
 		if(/^ist das falsch\??/i.test(msg))
 			return oneof(['nein', 'ja']);
@@ -205,6 +208,7 @@ function process(message, from) {
 		if(message.indexOf('?') !== -1) {
 			var metaquestion = /wer (von euch )?kennt sich.* mit .* aus|(jemand|wer) (hier|da).* der sich (mit .* auskennt|auskennt mit)|kennt sich(hier )? wer mit .* aus/gi;
 			var alive = /^((hi|hallo) )?(ist )?(gerade )?(wer|jemand|irgendwer) (da|hier)$/i;
+			var noalive = /^(niemand|keiner) (da|hier)$/i;
 			var mysql = /^wo finde ich (die|meine) mysql[ -](zugangs)?daten|^wo sehe ich die daten für MySQL|^wie komme? ich (hier )?auf meine mysql/gi;
 			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde/gi;
 			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo (der file-?manager (hin(gekommen)?|zu finden) ist|ich den file-?manager finde)/gi;
@@ -225,15 +229,33 @@ function process(message, from) {
 					return 'PHPMyAdmin findest du unter http://mysql.lima-city.de/';
 				} else if(alive.test(question)) {
 					return 'nein';
+				} else if(noalive.test(question)) {
+					return 'siehst du wen?';
 				}
 			}
 		} else if(message.toLowerCase() == 'ping') {
 			return 'pong';
+		} else if(message.toLowerCase() == '*ping*') {
+			return '*pong*';
+		} else if(/^[A-Za-z]$/.test(message)) {
+			delta = (Date.now() - lastabc) / 1000;
+			if(delta > config.abcgrace) {
+				lastabc = Date.now();
+				var charcode = message.toUpperCase().charCodeAt(0);
+				var next = charcode + 1;
+				if(next >= 0x5A)
+					next = 0x41;
+				var c = String.fromCharCode(next);
+				if(/^[a-z]$/.test(message))
+					c = c.toLowerCase();
+				return c;
+			}
 		} else if(config.hands) {
 			if(message == '\\o/') {
-				lasthands = Date.now();
-				if(delta > config.handsgrace)
+				if(delta > config.handsgrace) {
+					lasthands = Date.now();
 					return '\\o/';
+				}
 				return null;
 			} else if(message == '/o/') {
 				return '\\o\\';
