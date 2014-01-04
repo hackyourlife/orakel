@@ -14,11 +14,32 @@ config.abcgrace = 30;
 
 var capslocked = {};
 var capscleared = {};
-var lasthands = 0;
-var lastgreet = 0;
-var lastabc = 0;
 var knownquestions = {};
 var questionlist = [];
+
+var state = {
+	lasthands: 0,
+	lastgreet: 0,
+	lastabc: 0,
+	remembered: '…'
+};
+
+function saveState() {
+	util.log('saving state');
+	var s = JSON.stringify(state);
+	fs.writeFileSync('state', s);
+}
+
+function loadState() {
+	util.log('loading state');
+	var s = fs.readFileSync('state').toString();
+	state = JSON.parse(s);
+}
+
+function setProperty(name, value) {
+	state[name] = value;
+	saveState();
+}
 
 function readMessages(file) {
 	var data = fs.readFileSync(file).toString().split('\n');
@@ -71,6 +92,12 @@ function processPrivate(message, from) {
 			case '?':
 				return { sendPublic: false, text: 'Öffentlich: ' +
 					questionlist.join(', ') };
+			case 'save':
+				saveState();
+				return null;
+			case 'load':
+				loadState();
+				return null;
 		}
 	} else if(parts.length > 1) {
 		switch(parts[0]) {
@@ -80,7 +107,7 @@ function processPrivate(message, from) {
 					text: message.substring(message.indexOf('say') + 4).trim()
 				};
 			case 'merke':
-				remembered = msg.substring(parts[0].length + 1).trim();
+				setProperty('remembered', message.substring(parts[0].length + 1).trim());
 				return null;
 			case 'hands':
 				config.hands = parts[1] == 'on';
@@ -90,7 +117,6 @@ function processPrivate(message, from) {
 	return null;
 }
 
-var remembered = '…';
 function process(message, from) {
 	if(isMentation(message)) {
 		var msg = message.substring(config.room_nick.length + 1);
@@ -123,7 +149,7 @@ function process(message, from) {
 			switch(command) {
 				case 'sprich':
 				case 'sprich!':
-					return remembered;
+					return state.remembered;
 				case 'hä?':
 					return 'Wos is?';
 				case 'aus!':
@@ -141,13 +167,15 @@ function process(message, from) {
 					return 'hallo';
 				case 'stinkt':
 					return 'nein';
+				case 'ping': // anti-tchab hack
+					return oneof(['leck mich!', 'nix da', 'du kannst mich mal :P']);
 				default:
 					return null;
 			}
 		} else {
 			switch(parts[0]) {
 				case 'merke':
-					remembered = msg.substring(parts[0].length + 1).trim();
+					setProperty('remembered', msg.substring(parts[0].length + 1).trim());
 					break;
 				case 'sag':
 					return msg.substring(parts[0].length + 1).trim();
@@ -163,13 +191,13 @@ function process(message, from) {
 		// greet - self
 		var greetings = [ 'hallo', 'moin', 'hi', 'hai', 'servus', 'aloha', 'huhu' ];
 		var greet = false;
-		var deltagreet = (Date.now() - lastgreet) / 1000;
+		var deltagreet = (Date.now() - state.lastgreet) / 1000;
 		for(var i = 0; i < greetings.length; i++) {
 			if(message.toLowerCase() == greetings[i] + ' ' + config.room_nick.toLowerCase())
 				greet = true;
 		}
 		if(greet && (deltagreet > config.greetgrace)) {
-			lastgreet = Date.now();
+			setProperty('lastgreet', Date.now());
 			return oneof(['hi', 'hai', 'hallo', 'huhu']);
 		}
 
@@ -203,7 +231,7 @@ function process(message, from) {
 		}
 		*/
 
-		var delta = (Date.now() - lasthands) / 1000;
+		var delta = (Date.now() - state.lasthands) / 1000;
 		// questions
 		if(message.indexOf('?') !== -1) {
 			var metaquestion = /wer (von euch )?kennt sich.* mit .* aus|(jemand|wer) (hier|da).* der sich (mit .* auskennt|auskennt mit)|kennt sich(hier )? wer mit .* aus/gi;
@@ -238,9 +266,9 @@ function process(message, from) {
 		} else if(message.toLowerCase() == '*ping*') {
 			return '*pong*';
 		} else if(/^[A-Za-z]$/.test(message)) {
-			delta = (Date.now() - lastabc) / 1000;
+			delta = (Date.now() - state.lastabc) / 1000;
 			if(delta > config.abcgrace) {
-				lastabc = Date.now();
+				setProperty('lastabc', Date.now());
 				var charcode = message.toUpperCase().charCodeAt(0);
 				var next = charcode + 1;
 				if(next >= 0x5A)
@@ -253,7 +281,7 @@ function process(message, from) {
 		} else if(config.hands) {
 			if(message == '\\o/') {
 				if(delta > config.handsgrace) {
-					lasthands = Date.now();
+					setProperty('lasthands', Date.now());
 					return '\\o/';
 				}
 				return null;
