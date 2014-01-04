@@ -59,6 +59,7 @@ function readMessages(file) {
 }
 
 readMessages('messages.csv');
+loadState();
 
 function clearCapsLocked(from) {
 	if(capslocked[from] !== undefined)
