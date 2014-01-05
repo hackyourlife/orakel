@@ -3,6 +3,7 @@ hilfe;https://www.lima-city.de/2008/help
 formate;https://www.lima-city.de/2008/speicherplatz#inhalte
 inhalte;https://www.lima-city.de/2008/speicherplatz#inhalte
 zip;https://www.lima-city.de/2008/speicherplatz#inhalte
+ftp;https://www.lima-city.de/usercp/ftp
 mysql;https://www.lima-city.de/usercp/databases
 pma;http://mysql.lima-city.de/
 phpmyadmin;http://mysql.lima-city.de/
@@ -11,6 +12,7 @@ subdomain;https://www.lima-city.de/usercp/subdomains
 subdomains;https://www.lima-city.de/usercp/subdomains
 domain;https://www.lima-city.de/usercp/domains
 domains;https://www.lima-city.de/usercp/domains
+avatar;https://www.lima-city.de/usercp/page%3Aavatar
 regeln;https://www.lima-city.de/2008/help#tabRules
 werbefreiheit;https://www.lima-city.de/2008/werbefreiheit
 rollen;https://www.lima-city.de/2008/rollen
@@ -28,6 +30,7 @@ paste;http://paste42.de/
 status;http://lima-status.de/
 metafrage;„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“
 pidgin;https://www.pidgin.im/
+haha;http://skia.deviantart.com/art/Haha-166700813
 /help;https://github.com/hackyourlife/orakel/blob/master/help.md
 help;https://github.com/hackyourlife/orakel/blob/master/help.md
 a;b

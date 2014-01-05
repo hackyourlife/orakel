@@ -121,7 +121,7 @@ function processPrivate(message, from) {
 function process(message, from) {
 	if(isMentation(message)) {
 		var msg = message.substring(config.room_nick.length + 1);
-		if(msg.charAt(0) == ':')
+		if(msg.charAt(0) == ':' || msg.charAt(0) == ',')
 			msg = message.substring(1);
 		msg = msg.trim();
 
@@ -301,7 +301,7 @@ function process(message, from) {
 function isMentation(message) {
 	if(message.toLowerCase().substring(0, config.room_nick.length) == config.room_nick.toLowerCase()) {
 		var c = message.charAt(config.room_nick.length);
-		if(c == ' ' || c == ':')
+		if(c == ' ' || c == ':' || c == ',')
 			return true;
 	}
 	return false;
