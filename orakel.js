@@ -272,7 +272,7 @@ function process(message, from) {
 				setProperty('lastabc', Date.now());
 				var charcode = message.toUpperCase().charCodeAt(0);
 				var next = charcode + 1;
-				if(next >= 0x5A)
+				if(next > 0x5A)
 					next = 0x41;
 				var c = String.fromCharCode(next);
 				if(/^[a-z]$/.test(message))
