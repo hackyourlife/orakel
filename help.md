@@ -36,3 +36,12 @@ Privater Chat
 
 * `?`: Liste aller geladenen Fragen wird ausgegeben
 * `ping` → `pong`
+
+Operator-Aktionen
+-----------------
+* `ops`: Liste der Operatoren wird angezeigt
+* `op nick`: `nick` wird als Operator hinzugefügt
+* `deop nick`: `nick` wird der Operator-Status entzogen
+* `trolled`: Liste aller getrollten wird angezeigt
+* `troll nick`: Der Benutzer `nick` bekommt bei jeder geschriebenen Zeile eine störende private Nachricht
+* `untroll nick`: Der Benutzer `nick` wird nicht länger getrollt

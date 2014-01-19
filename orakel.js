@@ -21,7 +21,9 @@ var state = {
 	lasthands: 0,
 	lastgreet: 0,
 	lastabc: 0,
-	remembered: '…'
+	remembered: '…',
+	mutelist: [],
+	operators: []
 };
 
 function saveState() {
@@ -39,6 +41,42 @@ function loadState() {
 function setProperty(name, value) {
 	state[name] = value;
 	saveState();
+}
+
+function mute(user) {
+	if(state.mutelist.indexOf(user) != -1)
+		return;
+	state.mutelist.push(user);
+	saveState();
+}
+
+function unmute(user) {
+	var id = state.mutelist.indexOf(user);
+	if(id != -1)
+		state.mutelist.splice(id, 1);
+	saveState();
+}
+
+function isMuted(user) {
+	return state.mutelist.indexOf(user) != -1;
+}
+
+function addOperator(user) {
+	if(state.operators.indexOf(user) != -1)
+		return;
+	state.operators.push(user);
+	saveState();
+}
+
+function rmOperator(user) {
+	var id = state.operators.indexOf(user);
+	if(id != -1)
+		state.operators.splice(id, 1);
+	saveState();
+}
+
+function isOperator(user) {
+	return state.operators.indexOf(user) != -1;
 }
 
 function readMessages(file) {
@@ -99,6 +137,15 @@ function processPrivate(message, from) {
 			case 'load':
 				loadState();
 				return null;
+			case 'trolled':
+				if(!isOperator(getNick(from)))
+					return null;
+				return { sendPublic: false, text: 'Trolled: ' + state.mutelist.join(', ') };
+			case 'ops':
+			case 'operators':
+				if(!isOperator(getNick(from)))
+					return null;
+				return { sendPublic: false, text: 'Operators: ' + state.operators.join(', ') };
 		}
 	} else if(parts.length > 1) {
 		switch(parts[0]) {
@@ -106,6 +153,34 @@ function processPrivate(message, from) {
 				return {
 					sendPublic: true,
 					text: message.substring(message.indexOf('say') + 4).trim()
+				};
+			case 'troll':
+				var username = parts[1];
+				mute(username);
+				return {
+					sendPublic: false,
+					text: 'User "' + username + '" wird getrollt'
+				};
+			case 'untroll':
+				var username = parts[1];
+				unmute(username);
+				return {
+					sendPublic: false,
+					text: 'User "' + username + '" wird nicht mehr getrollt'
+				};
+			case 'op':
+				var username = parts[1];
+				addOperator(username);
+				return {
+					sendPublic: false,
+					text: 'User "' + username + '" ist jetzt Operator'
+				};
+			case 'deop':
+				var username = parts[1];
+				rmOperator(username);
+				return {
+					sendPublic: false,
+					text: 'User "' + username + '" ist kein Operator mehr'
 				};
 			case 'merke':
 				setProperty('remembered', message.substring(parts[0].length + 1).trim());
@@ -119,6 +194,10 @@ function processPrivate(message, from) {
 }
 
 function process(message, from) {
+	var nick = getNick(from);
+	if(isMuted(nick)) {
+		privmsg(from, oneof(['Du wurdest gemuted', 'Lalalalalalalala', 'Hihihihihi', 'Trolololololl', 'Hahahahaha']));
+	}
 	if(isMentation(message)) {
 		var msg = message.substring(config.room_nick.length + 1);
 		if(msg.charAt(0) == ':' || msg.charAt(0) == ',')
@@ -169,7 +248,15 @@ function process(message, from) {
 				case 'stinkt':
 					return 'nein';
 				case 'ping': // anti-tchab hack
-					return oneof(['leck mich!', 'nix da', 'du kannst mich mal :P']);
+					switch(nick) {
+						case 'tchab':
+							return oneof(['Für dich immer noch »pink«!', 'Gib a rua, Schwuggele', 'Klappe zu, Schwulibert!']);
+						case 'T':
+							return oneof(['pong', '*pflopp*', 'peng!']);
+					}
+					return oneof(['leck mich!', 'nix da', 'du kannst mich mal :P', 'hupf in Gatsch!']);
+				case 'pink':
+					return 'ponk';
 				default:
 					return null;
 			}
@@ -182,7 +269,7 @@ function process(message, from) {
 					return msg.substring(parts[0].length + 1).trim();
 				case 'Du':
 				case 'du':
-					return 'nein ' + getNick(from) + ', ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
+					return 'nein ' + nick + ', ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
 				case 'stinkt':
 					return 'nein';
 			}
@@ -266,6 +353,8 @@ function process(message, from) {
 			return 'pong';
 		} else if(message.toLowerCase() == '*ping*') {
 			return '*pong*';
+		} else if(message.toLowerCase() == 'pink') {
+			return 'ponk';
 		} else if(/^[A-Za-z]$/.test(message)) {
 			delta = (Date.now() - state.lastabc) / 1000;
 			if(delta > config.abcgrace) {
@@ -309,6 +398,12 @@ function isMentation(message) {
 
 function getNick(from) {
 	return from.substring(config.room_jid.length + 1);
+}
+
+function privmsg(to, text) {
+	cl.send(new xmpp.Element('message', { to: to, type: 'chat' })
+		.c('body')
+		.t(text));
 }
 
 var cl = new xmpp.Client({
