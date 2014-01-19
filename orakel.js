@@ -44,6 +44,7 @@ function setProperty(name, value) {
 }
 
 function mute(user) {
+	util.log('muting user "' + user + '"');
 	if(state.mutelist.indexOf(user) != -1)
 		return;
 	state.mutelist.push(user);
@@ -51,6 +52,7 @@ function mute(user) {
 }
 
 function unmute(user) {
+	util.log('unmuting user "' + user + '"');
 	var id = state.mutelist.indexOf(user);
 	if(id != -1)
 		state.mutelist.splice(id, 1);
@@ -62,6 +64,7 @@ function isMuted(user) {
 }
 
 function addOperator(user) {
+	util.log('"' + user + '" is now operator');
 	if(state.operators.indexOf(user) != -1)
 		return;
 	state.operators.push(user);
@@ -69,6 +72,7 @@ function addOperator(user) {
 }
 
 function rmOperator(user) {
+	util.log('"' + user + '" is no longer operator');
 	var id = state.operators.indexOf(user);
 	if(id != -1)
 		state.operators.splice(id, 1);
@@ -218,6 +222,8 @@ function process(message, from) {
 			return oneof(['ja', 'nein']);
 		if(/^ist das falsch\??/i.test(msg))
 			return oneof(['nein', 'ja']);
+		if(/^(wie spät(ist es)?|zeit)\??/i.test(msg))
+			return new Date();
 
 		var parts = msg.split(' ');
 		if(parts.length == 1) {
@@ -401,6 +407,7 @@ function getNick(from) {
 }
 
 function privmsg(to, text) {
+	util.log('privmsg => ' + to + ': ' + text);
 	cl.send(new xmpp.Element('message', { to: to, type: 'chat' })
 		.c('body')
 		.t(text));
