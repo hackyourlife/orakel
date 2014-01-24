@@ -8,6 +8,7 @@ mysql;https://www.lima-city.de/usercp/databases
 pma;http://mysql.lima-city.de/
 phpmyadmin;http://mysql.lima-city.de/
 filemanager;http://filemanager.lima-city.de/
+mail;https://www.lima-city.de/postoffice
 subdomain;https://www.lima-city.de/usercp/subdomains
 subdomains;https://www.lima-city.de/usercp/subdomains
 domain;https://www.lima-city.de/usercp/domains
