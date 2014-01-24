@@ -200,7 +200,7 @@ function processPrivate(message, from) {
 function process(message, from) {
 	var nick = getNick(from);
 	if(isMuted(nick)) {
-		privmsg(from, oneof(['Du wurdest gemuted', 'Lalalalalalalala', 'Hihihihihi', 'Trolololololl', 'Hahahahaha']));
+		privmsg(from, oneof(['Du wurdest gemuted', 'La le lu, nur der Mann im Mond hört zu …', 'Lalalalala', 'Hihihihihi', 'Trolololol', 'Hahahahaha']));
 	}
 	if(isMentation(message)) {
 		var msg = message.substring(config.room_nick.length + 1);
