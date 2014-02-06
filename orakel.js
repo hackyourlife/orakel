@@ -159,6 +159,8 @@ function processPrivate(message, from) {
 					text: message.substring(message.indexOf('say') + 4).trim()
 				};
 			case 'troll':
+				if(!isOperator(getNick(from)))
+					return null;
 				var username = parts[1];
 				mute(username);
 				return {
@@ -166,6 +168,8 @@ function processPrivate(message, from) {
 					text: 'User "' + username + '" wird getrollt'
 				};
 			case 'untroll':
+				if(!isOperator(getNick(from)))
+					return null;
 				var username = parts[1];
 				unmute(username);
 				return {
@@ -173,6 +177,8 @@ function processPrivate(message, from) {
 					text: 'User "' + username + '" wird nicht mehr getrollt'
 				};
 			case 'op':
+				if(!isOperator(getNick(from)))
+					return null;
 				var username = parts[1];
 				addOperator(username);
 				return {
@@ -180,6 +186,8 @@ function processPrivate(message, from) {
 					text: 'User "' + username + '" ist jetzt Operator'
 				};
 			case 'deop':
+				if(!isOperator(getNick(from)))
+					return null;
 				var username = parts[1];
 				rmOperator(username);
 				return {
@@ -191,6 +199,30 @@ function processPrivate(message, from) {
 				return null;
 			case 'hands':
 				config.hands = parts[1] == 'on';
+				return null;
+			case 'no':
+				if(parts.length > 2) {
+					switch(parts[1]) {
+						case 'troll':
+							if(!isOperator(getNick(from)))
+								return null;
+							var username = parts[2];
+							unmute(username);
+							return {
+								sendPublic: false,
+								text: 'User "' + username + '" wird nicht mehr getrollt'
+							};
+						case 'op':
+							if(!isOperator(getNick(from)))
+								return null;
+							var username = parts[2];
+							rmOperator(username);
+							return {
+								sendPublic: false,
+								text: 'User "' + username + '" ist kein Operator mehr'
+							};
+					}
+				}
 				return null;
 		}
 	}
@@ -278,6 +310,48 @@ function process(message, from) {
 					return 'nein ' + nick + ', ' + parts[0] + ' ' + msg.substring(parts[0].length + 1).trim();
 				case 'stinkt':
 					return 'nein';
+				case 'troll':
+					if(!isOperator(getNick(from)))
+						return null;
+					var username = parts[1];
+					mute(username);
+					return 'User "' + username + '" wird getrollt';
+				case 'untroll':
+					if(!isOperator(getNick(from)))
+						return null;
+					var username = parts[1];
+					unmute(username);
+					return 'User "' + username + '" wird nicht mehr getrollt';
+				case 'op':
+					if(!isOperator(getNick(from)))
+						return null;
+					var username = parts[1];
+					addOperator(username);
+					return 'User "' + username + '" ist jetzt Operator';
+				case 'deop':
+					if(!isOperator(getNick(from)))
+						return null;
+					var username = parts[1];
+					rmOperator(username);
+					return 'User "' + username + '" ist kein Operator mehr';
+				case 'no':
+					if(parts.length > 2) {
+						switch(parts[1]) {
+							case 'troll':
+								if(!isOperator(getNick(from)))
+									return null;
+								var username = parts[2];
+								unmute(username);
+								return 'User "' + username + '" wird nicht mehr getrollt';
+							case 'op':
+								if(!isOperator(getNick(from)))
+									return null;
+								var username = parts[2];
+								rmOperator(username);
+								return 'User "' + username + '" ist kein Operator mehr';
+						}
+					}
+					break;
 			}
 			return null;
 		}
@@ -335,6 +409,8 @@ function process(message, from) {
 			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde/gi;
 			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo (der file-?manager (hin(gekommen)?|zu finden) ist|ich den file-?manager finde)/gi;
 			var ftp = /^(wie|wo) (bekommt|findet) man (die|seine) ftp[- ](zugangs-?)?daten|(wie|wo) (bekomme|finde) ich (meine|die) ftp[- ](zugangs-?)?daten/gi;
+			var rm = /^(wo|wie) kann ((man sich|ich mich)|(ich meinen|man seinen) (acc|account)) (hier )?löschen$|^wo ist? der account[- ](löschen|entfernen)[- ]knopf$/gi;
+			var buydb = /^((man muss|muss man) (hier )?)?(dbs?|mysql|datenbank(en)?) kaufen$/gi;
 			var understand = false;
 			var questions = message.split('?');
 			for(var i = 0; i < questions.length; i++) {
@@ -353,9 +429,16 @@ function process(message, from) {
 					return 'nein';
 				} else if(noalive.test(question)) {
 					return 'siehst du wen?';
+				} else if(rm.test(question)) {
+					return 'https://www.lima-city.de/usercp/page%3Adelete';
+				} else if(buydb.test(question)) {
+					return 'Du bekommst eine Datenbank nach 10 Beiträgen im Forum, wenn du eine Domain kaufst, oder du kaufst sie dir gegen echtes Geld. Außerdem kannst du auch Datenbanken von anderen Anbietern hier nutzen.';
 				}
 			}
 		} else if(message.toLowerCase() == 'ping') {
+			if(isMuted(nick)) {
+				return oneof([ 'Bäh!', 'peng!' ]);
+			}
 			return 'pong';
 		} else if(message.toLowerCase() == '*ping*') {
 			return '*pong*';

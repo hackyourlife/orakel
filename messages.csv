@@ -1,8 +1,8 @@
 lima-city;https://www.lima-city.de/
-hilfe;https://www.lima-city.de/2008/help
-formate;https://www.lima-city.de/2008/speicherplatz#inhalte
-inhalte;https://www.lima-city.de/2008/speicherplatz#inhalte
-zip;https://www.lima-city.de/2008/speicherplatz#inhalte
+hilfe;https://www.lima-city.de/hilfe
+formate;https://www.lima-city.de/hilfe/welche-dateiformate-sind-auf-dem-webspace-verboten
+inhalte;https://www.lima-city.de/hilfe/welche-dateiformate-sind-auf-dem-webspace-verboten
+zip;https://www.lima-city.de/hilfe/welche-dateiformate-sind-auf-dem-webspace-verboten
 ftp;https://www.lima-city.de/usercp/ftp
 mysql;https://www.lima-city.de/usercp/databases
 pma;http://mysql.lima-city.de/
@@ -11,17 +11,19 @@ filemanager;http://filemanager.lima-city.de/
 mail;https://mail.lima-city.de
 postfach;https://www.lima-city.de/postoffice
 postfächer;https://www.lima-city.de/postoffice
+gulden;https://www.lima-city.de/hilfe/was-sind-gulden
 subdomain;https://www.lima-city.de/usercp/subdomains
 subdomains;https://www.lima-city.de/usercp/subdomains
 domain;https://www.lima-city.de/usercp/domains
 domains;https://www.lima-city.de/usercp/domains
 avatar;https://www.lima-city.de/usercp/page%3Aavatar
-regeln;https://www.lima-city.de/2008/help#tabRules
+regeln;https://www.lima-city.de/hilfe/welche-allgemeinen-regeln-gibt-es
 werbefreiheit;https://www.lima-city.de/2008/werbefreiheit
 rollen;https://www.lima-city.de/2008/rollen
 zahlungsmittel;https://www.lima-city.de/2008/zahlungsmittel
-webspace;https://www.lima-city.de/2008/webspace
-download;https://www.lima-city.de/2008/download
+webspace;https://www.lima-city.de/hilfe/kategorie/webspace
+download;https://www.lima-city.de/hilfe/was-ist-der-download-server
+traffic;https://www.lima-city.de/hilfe/wie-viel-traffic-habe-ich
 auktion;https://www.lima-city.de/auctions
 ticket;https://www.lima-city.de/usercp/tickets/
 talkr;http://jabber.lima-city.de/
@@ -31,7 +33,7 @@ delete;https://www.lima-city.de/usercp/page%3Adelete
 phpinfo;http://system.lima-city.de/info.php
 paste;http://paste42.de/
 status;http://lima-status.de/
-metafrage;„Don\'t ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“
+metafrage;„Don't ask to ask, or ask if anyone is here, or if anyone is alive, or if anyone uses something. Just ask!“
 pidgin;https://www.pidgin.im/
 haha;http://skia.deviantart.com/art/Haha-166700813
 /help;https://github.com/hackyourlife/orakel/blob/master/help.md
