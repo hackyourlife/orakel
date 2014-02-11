@@ -406,11 +406,12 @@ function process(message, from) {
 			var alive = /^((hi|hallo) )?(ist )?(gerade )?(wer|jemand|irgendwer) (da|hier)$/i;
 			var noalive = /^(niemand|keiner) (da|hier)$/i;
 			var mysql = /^wo finde ich (die|meine) mysql[ -](zugangs)?daten|^wo sehe ich die daten für MySQL|^wie komme? ich (hier )?auf meine mysql/gi;
-			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde/gi;
+			var pma = /^kann (mir )?(jemand|wer|irgendwer) sagen wo ich (hier )?(mein )?phpmyadmin finde|^wo finde ich (hier )?(mein )?phpmyadmin/gi;
 			var filemanager = /^wei[sß] (jemand|wer|irgendwer),? wo (der file-?manager (hin(gekommen)?|zu finden) ist|ich den file-?manager finde)/gi;
 			var ftp = /^(wie|wo) (bekommt|findet) man (die|seine) ftp[- ](zugangs-?)?daten|(wie|wo) (bekomme|finde) ich (meine|die) ftp[- ](zugangs-?)?daten/gi;
 			var rm = /^(wo|wie) kann ((man sich|ich mich)|(ich meinen|man seinen) (acc|account)) (hier )?löschen$|^wo ist? der account[- ](löschen|entfernen)[- ]knopf$/gi;
 			var buydb = /^((man muss|muss man) (hier )?)?(dbs?|mysql|datenbank(en)?) kaufen$/gi;
+			var avatar = /^(wo|wie) kann (man|ich) (hier|auf lima(-?city)?) ((meinen|den) avatar|(mein|das) profil-?(bild|foto)) (ändern|umstellen)$/gi;
 			var understand = false;
 			var questions = message.split('?');
 			for(var i = 0; i < questions.length; i++) {
@@ -433,6 +434,8 @@ function process(message, from) {
 					return 'https://www.lima-city.de/usercp/page%3Adelete';
 				} else if(buydb.test(question)) {
 					return 'Du bekommst eine Datenbank nach 10 Beiträgen im Forum, wenn du eine Domain kaufst, oder du kaufst sie dir gegen echtes Geld. Außerdem kannst du auch Datenbanken von anderen Anbietern hier nutzen.';
+				} else if(avatar.test(question)) {
+					return 'Deinen Avatar kannst du hier ändern: https://www.lima-city.de/usercp/page%3Aavatar';
 				}
 			}
 		} else if(message.toLowerCase() == 'ping') {
