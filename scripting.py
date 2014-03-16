@@ -161,8 +161,10 @@ class Scripting(object):
 			result = self.evaluate(msg)
 			if result:
 				send_message(str(result))
+				return True
 		except:
-			return False
+			pass
+		return False
 
 if __name__ == "__main__":
 	code = """

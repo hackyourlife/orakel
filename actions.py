@@ -125,10 +125,11 @@ class Actions(object):
 		tokens = msg.split(" ")
 		action = tokens[0].strip()
 		args = " ".join(tokens[1:]).strip()
-		result = self.actions[action](args)
-		if result:
-			send_message(result)
-			return True
+		if action in self.actions:
+			result = self.actions[action](args)
+			if result:
+				send_message(result)
+				return True
 		return False
 
 	def passive(self, msg, nick, send_message):
