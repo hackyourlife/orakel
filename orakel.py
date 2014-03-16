@@ -12,7 +12,10 @@ from alphabet import Alphabet
 from count import Count
 from search import Search
 from greet import Greet
-from expression import Expression
+#from expression import Expression
+from actions import Actions
+from storage import Storage
+from scripting import Scripting
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -39,6 +42,8 @@ if __name__ == "__main__":
 	room = config.get("xmpp", "room")
 	nick = config.get("xmpp", "nick")
 
+	storage = Storage(config.get("db", "storage"))
+
 	questions = load_database(config.get("db", "questions"))
 	msgdb = MessageDatabase(questions)
 	pingpong = PingPong()
@@ -49,7 +54,9 @@ if __name__ == "__main__":
 
 	search_engines = load_database(config.get("db", "searchengines"))
 	search = Search(search_engines)
-	expression = Expression()
+	#expression = Expression()
+	actions = Actions(storage)
+	scripting = Scripting(storage)
 
 	logging.basicConfig(level=logging.INFO,
 		                        format='%(levelname)-8s %(message)s')
@@ -59,12 +66,15 @@ if __name__ == "__main__":
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
 	xmpp.add_mentation_listener(msgdb)
+	xmpp.add_mentation_listener(actions.active)
 	xmpp.add_message_listener(pingpong)
 	xmpp.add_message_listener(alphabet)
 	xmpp.add_message_listener(count)
 	xmpp.add_message_listener(search)
 	xmpp.add_message_listener(greet)
-	xmpp.add_message_listener(expression)
+	#xmpp.add_message_listener(expression)
+	xmpp.add_message_listener(actions.passive)
+	xmpp.add_message_listener(scripting)
 
 	if xmpp.connect():
 		xmpp.process(block=True)
