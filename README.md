@@ -6,16 +6,25 @@ antwortet auf einige Fragen und reagiert auf manche Ereignisse.
 
 Konfiguration
 =============
-```js
-var config = {
-	jid: 'username@jabber.lima-city.de/orakel',
-	password: 'password',
-	room_jid: 'support@conference.jabber.lima-city.de',
-	room_nick: 'Orakel',
-	hands: false,
-	handsgrace: 10,
-	greetgrace: 120
-};
+```
+[xmpp]
+jid = username@jabber.lima-city.de
+password = secret
+room = support@conference.jabber.lima-city.de
+nick = Orakel
+
+[db]
+questions = messages.csv
+searchengines = searchengines.csv
+
+[modules]
+greetings = hallo,moin,hi,hai,servus,aloha,huhu
+hands = False
+
+[timeouts]
+hands = 10
+greet = 120
+alphabet = 30
 ```
 
 - `hands`: Reagieren auf `\o/`, `o-` & Co.
