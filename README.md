@@ -16,6 +16,7 @@ nick = Orakel
 [db]
 questions = messages.csv
 searchengines = searchengines.csv
+storage = storage.json
 
 [modules]
 greetings = hallo,moin,hi,hai,servus,aloha,huhu
