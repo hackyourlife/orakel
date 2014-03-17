@@ -5,6 +5,8 @@ import ast
 import operator as op
 import math
 from urllib.parse import quote as urlencode
+import dns.resolver
+import icmplib
 
 """
 import sys
@@ -52,8 +54,22 @@ def utcnow():
 def now():
 	return datetime.datetime.now()
 
-def ping(ip):
-	return "not implemented"
+def ping(address):
+	return icmplib.ping(address)
+
+def alive(address):
+	if icmplib.ping(address):
+		return "%s is alive!" % address
+	return "%s is dead!" % address
+
+def dnsquery(domain, record='A'):
+	records = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA', 'SRV', 'TXT']
+	if not record in records:
+		raise Exception('permission denied')
+	resolver = dns.resolver.Resolver()
+	resolver.nameservers = [ '8.8.8.8', '8.8.4.4' ]
+	result = [ str(x) for x in resolver.query(domain, record) ]
+	return result
 
 class ReturnException(Exception):
 	def __init__(self, value):
@@ -94,6 +110,9 @@ class Scripting(object):
 			"date": date,
 			"time": time,
 			"uuid": uuid,
+			"ping": ping,
+			"alive": alive,
+			"dnsquery": dnsquery
 	}
 
 	def __init__(self, storage, search_engines={}):

@@ -5,6 +5,7 @@ from utils import oneof
 from re import match
 import datetime
 import uuid as guid
+import icmplib
 
 _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 _DATE_FORMAT = '%d.%m.%Y'
@@ -65,7 +66,8 @@ class Actions(object):
 		self.actions = {
 			"sag": self.sag,
 			"merke": self.merke,
-			"sprich": self.sprich }
+			"sprich": self.sprich,
+			"ping": self.ping }
 		self.directactions = {
 			"stimmt das": self.stimmt_das,
 			"ist das schlimm": self.ist_das_schlimm,
@@ -79,7 +81,8 @@ class Actions(object):
 		self.regex = {
 			"^bist du ein bot\\??$": "Nein",
 			"^(wer|was) bist du\\??$": "das Orakel" }
-		self.passive_actions = {}
+		self.passive_actions = {
+			"!ping": self.ping }
 		self.passive_directactions = {
 			"!utc": isotime,
 			"!now": self.now,
@@ -115,6 +118,17 @@ class Actions(object):
 	def time(self):
 		return time(datetime.datetime.now())
 
+	def ping(self, addr):
+		addr = addr.split(" ")[0].strip()
+		try:
+			result = icmplib.ping(addr)
+			if not result:
+				return "Request timed out"
+			else:
+				return "%1.2fms" % (result * 1000)
+		except:
+			return None
+
 	def active(self, msg, nick, send_message):
 		direct = msg[:-1].strip() if msg[-1] == '?' else msg
 		if direct in self.directactions:
@@ -139,4 +153,12 @@ class Actions(object):
 			result = action if type(action) == str else action()
 			send_message(result)
 			return True
+		tokens = msg.split(" ")
+		action = tokens[0].strip()
+		args = " ".join(tokens[1:]).strip()
+		if action in self.passive_actions:
+			result = self.passive_actions[action](args)
+			if result:
+				send_message(result)
+				return True
 		return False
