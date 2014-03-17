@@ -55,10 +55,6 @@ def now():
 def ping(ip):
 	return "not implemented"
 
-search_engines = { 'google': 'https://www.google.com/search?q=%s' }
-def search(engine, query):
-	return search_engines[engine] % urlencode(query)
-
 class ReturnException(Exception):
 	def __init__(self, value):
 		Exception.__init__(self)
@@ -76,7 +72,14 @@ class Scripting(object):
 	constants = {	"pi": math.pi,
 			"π": math.pi,
 			"True": True,
-			"False": False }
+			"False": False,
+			"None": None }
+
+	def search(self, engine, query):
+		return self.search_engines[engine] % urlencode(query)
+
+	def _vars(self):
+		return self.variables
 
 	functions  = {	"sin": math.sin,
 			"cos": math.cos,
@@ -91,17 +94,25 @@ class Scripting(object):
 			"date": date,
 			"time": time,
 			"uuid": uuid,
-			"search": search
 	}
 
-	def __init__(self, storage):
+	def __init__(self, storage, search_engines={}):
 		self.storage = storage
+		self.search_engines = search_engines
 		try:
 			self.variables = storage["variables"]
 		except:
 			self.variables = {}
 
+		functions = {
+			"search": self.search,
+			"vars": self._vars }
+		for key in functions.keys():
+			self.functions[key] = functions[key]
+
 	def evaluate(self, expr):
+		if expr in self.variables:
+			return False
 		x = ast.parse(expr)
 		try:
 			result = [ self._eval(z) for z in x.body ]
@@ -153,6 +164,9 @@ class Scripting(object):
 			self.variables[target] = value
 			#return value
 			return None
+		elif isinstance(node, ast.Delete):
+			target = node.targets[0].id
+			del self.variables[target]
 		else:
 			raise TypeError(node)
 
@@ -165,10 +179,3 @@ class Scripting(object):
 		except:
 			pass
 		return False
-
-if __name__ == "__main__":
-	code = """
-return "Hello, World"
-	"""
-	s = Scripting()
-	print("result: '%s'" % s.evaluate(code))

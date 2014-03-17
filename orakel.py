@@ -56,7 +56,7 @@ if __name__ == "__main__":
 	search = Search(search_engines)
 	#expression = Expression()
 	actions = Actions(storage)
-	scripting = Scripting(storage)
+	scripting = Scripting(storage, search_engines=search_engines)
 
 	logging.basicConfig(level=logging.INFO,
 		                        format='%(levelname)-8s %(message)s')

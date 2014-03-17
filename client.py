@@ -33,6 +33,8 @@ class Client(sleekxmpp.ClientXMPP):
 		nick = msg['mucnick']
 		if nick != self.nick:
 			if msg['body'].startswith(self.nick):
+				if len(msg['body']) <= len(self.nick) + 2:
+					return
 				text = msg['body'][len(self.nick) + 1:].strip()
 				for listener in self.mentation_listeners:
 					if listener(text, nick,
