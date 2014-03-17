@@ -58,8 +58,11 @@ def ping(address):
 	return icmplib.ping(address)
 
 def alive(address):
-	if icmplib.ping(address):
-		return "%s is alive!" % address
+	try:
+		if icmplib.ping(address):
+			return "%s is alive!" % address
+	except:
+		pass
 	return "%s is dead!" % address
 
 def dnsquery(domain, record='A'):
@@ -83,7 +86,9 @@ class Scripting(object):
 			ast.Mult: op.mul,
 			ast.Div: op.truediv,
 			ast.Pow: op.pow,
-			ast.BitXor: op.xor }
+			ast.BitXor: op.xor,
+			ast.BitOr: op.or_,
+			ast.BitAnd: op.and_ }
 
 	constants = {	"pi": math.pi,
 			"π": math.pi,
@@ -97,6 +102,9 @@ class Scripting(object):
 	def _vars(self):
 		return self.variables
 
+	def do_eval(self, expression):
+		return self.evaluate(expression)
+
 	functions  = {	"sin": math.sin,
 			"cos": math.cos,
 			"tan": math.tan,
@@ -105,6 +113,11 @@ class Scripting(object):
 			"atan": math.atan,
 			"log": math.log,
 			"exp": math.exp,
+			"str": str,
+			"int": int,
+			"float": float,
+			"hex": hex,
+			"oct": oct,
 			"now": now,
 			"utc": utcnow,
 			"date": date,
@@ -125,13 +138,12 @@ class Scripting(object):
 
 		functions = {
 			"search": self.search,
-			"vars": self._vars }
+			"vars": self._vars,
+			"eval": self.do_eval }
 		for key in functions.keys():
 			self.functions[key] = functions[key]
 
 	def evaluate(self, expr):
-		if expr in self.variables:
-			return False
 		x = ast.parse(expr)
 		try:
 			result = [ self._eval(z) for z in x.body ]
@@ -190,10 +202,23 @@ class Scripting(object):
 			raise TypeError(node)
 
 	def __call__(self, msg, nick, send_message):
+		def allowed(c):
+			if c in ["\r", "\n", "\t"]:
+				return True
+			if ord(c) < 32:
+				return False
+			return True
 		try:
+			if msg in self.variables:
+				return False
 			result = self.evaluate(msg)
 			if result:
-				send_message(str(result))
+				if ("'%s'" % result) == msg or \
+						('"%s"' % result) == msg:
+					return False
+				result = [ c for c in str(result)
+						if allowed(c) ]
+				send_message("".join(result))
 				return True
 		except:
 			pass
