@@ -16,6 +16,7 @@ from greet import Greet
 from actions import Actions
 from storage import Storage
 from scripting import Scripting
+from fatfox import FatFox
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -42,6 +43,9 @@ if __name__ == "__main__":
 	room = config.get("xmpp", "room")
 	nick = config.get("xmpp", "nick")
 
+	logging.basicConfig(level=logging.INFO,
+		                        format='%(levelname)-8s %(message)s')
+
 	storage = Storage(config.get("db", "storage"))
 
 	questions = load_database(config.get("db", "questions"))
@@ -57,9 +61,7 @@ if __name__ == "__main__":
 	#expression = Expression()
 	actions = Actions(storage)
 	scripting = Scripting(storage, search_engines=search_engines)
-
-	logging.basicConfig(level=logging.INFO,
-		                        format='%(levelname)-8s %(message)s')
+	fatfox = FatFox()
 
 	xmpp = Client(jid, password, room, nick)
 	xmpp.register_plugin('xep_0030') # Service Discovery
@@ -73,6 +75,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(search)
 	xmpp.add_message_listener(greet)
 	#xmpp.add_message_listener(expression)
+	xmpp.add_message_listener(fatfox)
 	xmpp.add_message_listener(actions.passive)
 	xmpp.add_message_listener(scripting)
 

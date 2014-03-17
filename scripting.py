@@ -218,6 +218,8 @@ class Scripting(object):
 					return False
 				result = [ c for c in str(result)
 						if allowed(c) ]
+				if len(result) > 500:
+					result = result[:500] + "…"
 				send_message("".join(result))
 				return True
 		except:
