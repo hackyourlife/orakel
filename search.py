@@ -12,8 +12,12 @@ class Search(object):
 			return False
 		tokens = msg[1:].split(" ")
 		engine = tokens[0].strip()
+		if len(engine) < 1:
+			return False
 		if engine[-1] == ":":
 			engine = engine[:-1]
+		if len(engine) < 1:
+			return False
 		question = " ".join(tokens[1:]).strip()
 		if engine in self.search_engines:
 			send_message(self.search_engines[engine] %
