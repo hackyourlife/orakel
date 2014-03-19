@@ -76,9 +76,6 @@ def dnsquery(domain, record='A'):
 	result = [ str(x) for x in resolver.query(domain, record) ]
 	return result
 
-def join(s, x):
-	return s.join(x)
-
 class ReturnException(Exception):
 	def __init__(self, value):
 		Exception.__init__(self)
@@ -98,7 +95,26 @@ class Scripting(object):
 
 	attrfunctions = {
 			ast.Str: {
-				"join": join } }
+				"capitalize": str.capitalize,
+				"index": str.index,
+				"isalnum": str.isalnum,
+				"isalpha": str.isalpha,
+				"isdigit": str.isdigit,
+				"islower": str.islower,
+				"isspace": str.isspace,
+				"istitle": str.istitle,
+				"isupper": str.isupper,
+				"join": str.join,
+				"lower": str.lower,
+				"replace": str.replace,
+				"split": str.split,
+				"splitlines": str.splitlines,
+				"startswith": str.startswith,
+				"strip": str.strip,
+				"swapcase": str.swapcase,
+				"title": str.title,
+				"upper": str.upper,
+				"zfill": str.zfill } }
 
 	constants = {	"pi": math.pi,
 			"π": math.pi,
@@ -126,6 +142,8 @@ class Scripting(object):
 			"str": str,
 			"int": int,
 			"float": float,
+			"bool": bool,
+			"tuple": tuple,
 			"hex": hex,
 			"oct": oct,
 			"bin": bin,
@@ -135,6 +153,9 @@ class Scripting(object):
 			"type": type,
 			"sum": sum,
 			"abs": abs,
+			"len": len,
+			"min": min,
+			"max": max,
 			"now": now,
 			"utc": utcnow,
 			"date": date,
