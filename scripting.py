@@ -8,7 +8,7 @@ from urllib.parse import quote as urlencode
 import dns.resolver
 import icmplib
 import random
-import string
+import signal
 
 """
 import sys
@@ -81,6 +81,19 @@ class ReturnException(Exception):
 		Exception.__init__(self)
 		self.value = value
 
+class TimeoutException(Exception):
+	pass
+
+def time_limit(seconds):
+	def signal_handler(signum, frame):
+		raise TimeoutException()
+	signal.signal(signal.SIGALARM, signal_handler)
+	signal.alarm(seconds)
+	try:
+		yield
+	finally:
+		signal.alarm(0)
+
 class Scripting(object):
 	# supported operators
 	operators = {	ast.Add: op.add,
@@ -139,23 +152,27 @@ class Scripting(object):
 			"atan": math.atan,
 			"log": math.log,
 			"exp": math.exp,
-			"str": str,
-			"int": int,
-			"float": float,
-			"bool": bool,
-			"tuple": tuple,
-			"hex": hex,
-			"oct": oct,
-			"bin": bin,
-			"range": range,
-			"ord": ord,
-			"chr": chr,
-			"type": type,
-			"sum": sum,
 			"abs": abs,
+			"all": all,
+			"any": any,
+			"bin": bin,
+			"bool": bool,
+			"chr": chr,
+			"dict": dict,
+			"float": float,
+			"hex": hex,
+			"int": int,
 			"len": len,
-			"min": min,
+			"list": list,
 			"max": max,
+			"min": min,
+			"oct": oct,
+			"ord": ord,
+			"range": range,
+			"str": str,
+			"sum": sum,
+			"tuple": tuple,
+			"type": type,
 			"now": now,
 			"utc": utcnow,
 			"date": date,
@@ -273,7 +290,10 @@ class Scripting(object):
 			del self.variables[target]
 		elif node is None:
 			return None
-		elif isinstance(node, int):
+		elif isinstance(node, int) or isinstance(node, str) \
+				or isinstance(node, float) \
+				or isinstance(node, list) \
+				or isinstance(node, dict):
 			return node
 		else:
 			raise TypeError(node)
@@ -288,7 +308,8 @@ class Scripting(object):
 		try:
 			if msg in self.variables:
 				return False
-			result = self.evaluate(msg)
+			with time_limit(3):
+				result = self.evaluate(msg)
 			if result:
 				if ("'%s'" % result) == msg or \
 						('"%s"' % result) == msg:
