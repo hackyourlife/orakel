@@ -7,6 +7,8 @@ import math
 from urllib.parse import quote as urlencode
 import dns.resolver
 import icmplib
+import random
+import string
 
 """
 import sys
@@ -74,6 +76,9 @@ def dnsquery(domain, record='A'):
 	result = [ str(x) for x in resolver.query(domain, record) ]
 	return result
 
+def join(s, x):
+	return s.join(x)
+
 class ReturnException(Exception):
 	def __init__(self, value):
 		Exception.__init__(self)
@@ -88,7 +93,12 @@ class Scripting(object):
 			ast.Pow: op.pow,
 			ast.BitXor: op.xor,
 			ast.BitOr: op.or_,
-			ast.BitAnd: op.and_ }
+			ast.BitAnd: op.and_,
+			ast.Mod: op.mod }
+
+	attrfunctions = {
+			ast.Str: {
+				"join": join } }
 
 	constants = {	"pi": math.pi,
 			"π": math.pi,
@@ -118,6 +128,13 @@ class Scripting(object):
 			"float": float,
 			"hex": hex,
 			"oct": oct,
+			"bin": bin,
+			"range": range,
+			"ord": ord,
+			"chr": chr,
+			"type": type,
+			"sum": sum,
+			"abs": abs,
 			"now": now,
 			"utc": utcnow,
 			"date": date,
@@ -125,10 +142,12 @@ class Scripting(object):
 			"uuid": uuid,
 			"ping": ping,
 			"alive": alive,
-			"dnsquery": dnsquery
+			"dnsquery": dnsquery,
+			"random": random.random,
+			"randrange": random.randrange,
 	}
 
-	def __init__(self, storage, search_engines={}):
+	def __init__(self, storage=None, search_engines={}):
 		self.storage = storage
 		self.search_engines = search_engines
 		try:
@@ -148,11 +167,13 @@ class Scripting(object):
 		try:
 			result = [ self._eval(z) for z in x.body ]
 		except ReturnException as e:
-			self.storage["variables"] = self.variables
+			if not self.storage is None:
+				self.storage["variables"] = self.variables
 			return e.value
 		except:
 			raise
-		self.storage["variables"] = self.variables
+		if not self.storage is None:
+			self.storage["variables"] = self.variables
 		return result[-1]
 
 	def _eval(self, node):
@@ -166,12 +187,43 @@ class Scripting(object):
 			raise ReturnException(self._eval(node.value))
 		elif isinstance(node, ast.Attribute):
 			raise NotImplemented
+		elif isinstance(node, ast.List):
+			return [ self._eval(x) for x in node.elts ]
+		elif isinstance(node, ast.Subscript):
+			target = node.value.id
+			if isinstance(node.slice, ast.Index):
+				value = self._eval(node.slice.value)
+				return self.variables[target][value]
+			else:
+				lower = self._eval(node.slice.lower)
+				upper = self._eval(node.slice.upper)
+				step = self._eval(node.slice.step)
+				return self.variables[target][lower:upper:step]
+		elif isinstance(node, ast.ListComp):
+			generator = node.generators[0]
+			target = generator.target.id
+			items = self._eval(generator.iter)
+			if len(items) > 100:
+				raise Exception('too many iterations')
+			def step(x, y, z):
+				self.variables[y] = z
+				result = self._eval(x)
+				del self.variables[y]
+				return result
+			return [ step(node.elt, target, x) for x in items ]
 		elif isinstance(node, ast.Call):
-			if isinstance(node.func, ast.Attribute):
-				raise NotImplemented
-			function = node.func.id
 			args = [ self._eval(x) for x in node.args ]
-			return self.functions[function](*args)
+			if isinstance(node.func, ast.Attribute):
+				obj = node.func.value
+				func = node.func.attr
+				if type(obj) in self.attrfunctions:
+					function = self.attrfunctions[type(obj)][func]
+				else:
+					raise NotImplemented
+				args = [ self._eval(node.func.value) ] + args
+			else:
+				function = self.functions[node.func.id]
+			return function(*args)
 		elif isinstance(node, ast.Name):
 			if node.id in self.constants:
 				return self.constants[node.id]
@@ -198,6 +250,10 @@ class Scripting(object):
 		elif isinstance(node, ast.Delete):
 			target = node.targets[0].id
 			del self.variables[target]
+		elif node is None:
+			return None
+		elif isinstance(node, int):
+			return node
 		else:
 			raise TypeError(node)
 
