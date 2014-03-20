@@ -8,7 +8,9 @@ from urllib.parse import quote as urlencode
 import dns.resolver
 import icmplib
 import random
+import traceback
 import signal
+from contextlib import contextmanager
 
 """
 import sys
@@ -84,10 +86,23 @@ class ReturnException(Exception):
 class TimeoutException(Exception):
 	pass
 
-def time_limit(seconds):
+@contextmanager
+def __time_limit(seconds):
 	def signal_handler(signum, frame):
 		raise TimeoutException()
-	signal.signal(signal.SIGALARM, signal_handler)
+	signal.signal(signal.SIGALRM, signal_handler)
+	signal.alarm(seconds)
+	try:
+		yield
+	finally:
+		signal.alarm(0)
+
+def signal_handler(signum, frame):
+	raise TimeoutException()
+signal.signal(signal.SIGALRM, signal_handler)
+
+@contextmanager
+def time_limit(seconds):
 	signal.alarm(seconds)
 	try:
 		yield
@@ -308,7 +323,7 @@ class Scripting(object):
 		try:
 			if msg in self.variables:
 				return False
-			with time_limit(3):
+			with time_limit(10):
 				result = self.evaluate(msg)
 			if result:
 				if ("'%s'" % result) == msg or \
@@ -320,6 +335,9 @@ class Scripting(object):
 					result = result[:500] + "…"
 				send_message("".join(result))
 				return True
-		except:
+		except SyntaxError:
 			pass
+		except:
+			print("%s: '%s'" % (nick, msg))
+			traceback.print_exc()
 		return False
