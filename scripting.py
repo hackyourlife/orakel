@@ -243,15 +243,18 @@ class Scripting(object):
 		elif isinstance(node, ast.List):
 			return [ self._eval(x) for x in node.elts ]
 		elif isinstance(node, ast.Subscript):
-			target = node.value.id
+			if isinstance(node.value, ast.Name):
+				target = self.variables[node.value.id]
+			else:
+				target = self._eval(node.value)
 			if isinstance(node.slice, ast.Index):
 				value = self._eval(node.slice.value)
-				return self.variables[target][value]
+				return target[value]
 			else:
 				lower = self._eval(node.slice.lower)
 				upper = self._eval(node.slice.upper)
 				step = self._eval(node.slice.step)
-				return self.variables[target][lower:upper:step]
+				return target[lower:upper:step]
 		elif isinstance(node, ast.ListComp):
 			generator = node.generators[0]
 			target = generator.target.id
