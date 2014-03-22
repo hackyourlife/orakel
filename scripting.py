@@ -172,6 +172,7 @@ class Scripting(object):
 			"atan": math.atan,
 			"log": math.log,
 			"exp": math.exp,
+			"sqrt": math.sqrt,
 			"abs": abs,
 			"all": all,
 			"any": any,
