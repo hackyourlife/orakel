@@ -121,6 +121,11 @@ class Scripting(object):
 			ast.BitAnd: op.and_,
 			ast.Mod: op.mod }
 
+	unaryoperators = {
+			ast.USub: op.neg,
+			ast.UAdd: op.pos,
+			ast.Invert: op.invert }
+
 	attrfunctions = {
 			ast.Str: {
 				"capitalize": str.capitalize,
@@ -173,6 +178,7 @@ class Scripting(object):
 			"bin": bin,
 			"bool": bool,
 			"chr": chr,
+			"complex": complex,
 			"dict": dict,
 			"float": float,
 			"hex": hex,
@@ -287,6 +293,10 @@ class Scripting(object):
 				return self.variables[node.id]
 		elif isinstance(node, ast.operator): # <operator>
 			return self.operators[type(node)]
+		elif isinstance(node, ast.unaryop):
+			return self.unaryoperators[type(node)]
+		elif isinstance(node, ast.UnaryOp):
+			return self._eval(node.op)(self._eval(node.operand))
 		elif isinstance(node, ast.BinOp): # <left> <operator> <right>
 			operator = self._eval(node.op)
 			if operator is op.pow:
