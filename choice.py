@@ -4,11 +4,12 @@ import re
 from utils import oneof
 
 def choice(s):
-	r = r'^((hm+)?\.*\s+)?([a-zA-ZäöüÄÖÜß-]+) oder ([a-zA-ZäöüÄÖÜß-]+)\?'
+	r = r'^((hm+)?\.*\s+)?([a-zA-ZäöüÄÖÜß-]+)\soder\s([a-zA-ZäöüÄÖÜß-]+)\?'
 	match = re.match(r, s)
 	if match:
+		print(match.groups())
 		return [ match.group(3), match.group(4) ]
-	r = r'((hm+)?\.*\s+|.*:\s+)?([a-zA-ZäöüÄÖÜß-]+(, [a-zA-ZäöüAÖÜß-]+)+ oder [a-zA-ZäöüÄÖÜß-]+)\?'
+	r = r'((hm+)?\.*\s+|.*:\s+)?([a-zA-ZäöüÄÖÜß-]+(,\s[a-zA-ZäöüAÖÜß-]+)+\soder\s[a-zA-ZäöüÄÖÜß-]+)\?'
 	match = re.match(r, s)
 	if match:
 		data = [ x.strip() for x in match.group(3).split(",") ]
