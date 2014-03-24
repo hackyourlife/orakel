@@ -15,6 +15,7 @@ from greet import Greet
 #from expression import Expression
 from actions import Actions
 from storage import Storage
+from choice import react
 from scripting import Scripting
 from fatfox import FatFox
 
@@ -77,6 +78,7 @@ if __name__ == "__main__":
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
 	xmpp.add_message_listener(actions.passive)
+	xmpp.add_message_listener(react)
 	xmpp.add_message_listener(scripting)
 
 	if xmpp.connect():
