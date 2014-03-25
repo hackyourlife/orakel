@@ -4,6 +4,7 @@
 import ast
 import operator as op
 import math
+import re
 from urllib.parse import quote as urlencode
 import dns.resolver
 import icmplib
@@ -334,6 +335,8 @@ class Scripting(object):
 			if ord(c) < 32:
 				return False
 			return True
+		if re.match(r'^\s*[a-zA-Z0-9]+\s*$', msg):
+			return False
 		try:
 			if msg in self.variables:
 				return False

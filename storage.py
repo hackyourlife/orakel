@@ -26,3 +26,10 @@ class Storage(object):
 	def __setitem__(self, key, value):
 		self.values[key] = value
 		self.save()
+
+	def __getattr__(self, key):
+		return self.values[key]
+
+	def __setattr_(self, key, value):
+		self.values[key] = value
+		self.save()

@@ -15,7 +15,8 @@ from greet import Greet
 #from expression import Expression
 from actions import Actions
 from storage import Storage
-from choice import react
+from config import Configuration
+from choice import Choice
 from scripting import Scripting
 from fatfox import FatFox
 
@@ -49,11 +50,12 @@ if __name__ == "__main__":
 
 	storage = Storage(config.get("db", "storage"))
 
+	conf = Configuration(storage, config)
 	questions = load_database(config.get("db", "questions"))
 	msgdb = MessageDatabase(questions)
 	pingpong = PingPong()
-	alphabet = Alphabet()
-	count = Count()
+	alphabet = Alphabet(storage, conf)
+	count = Count(storage, conf)
 	greet = Greet([ x.strip() for x in
 			config.get("modules", "greetings").split(",") ], nick)
 
@@ -61,6 +63,7 @@ if __name__ == "__main__":
 	search = Search(search_engines)
 	#expression = Expression()
 	actions = Actions(storage)
+	choice = Choice(conf)
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
 
@@ -68,6 +71,7 @@ if __name__ == "__main__":
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
+	xmpp.add_mentation_listener(conf)
 	xmpp.add_mentation_listener(msgdb)
 	xmpp.add_mentation_listener(actions.active)
 	xmpp.add_message_listener(pingpong)
@@ -78,7 +82,7 @@ if __name__ == "__main__":
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
 	xmpp.add_message_listener(actions.passive)
-	xmpp.add_message_listener(react)
+	xmpp.add_message_listener(choice)
 	xmpp.add_message_listener(scripting)
 
 	if xmpp.connect():
