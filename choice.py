@@ -25,6 +25,8 @@ class Choice(object):
 	def __call__(self, msg, nick, send_message):
 		if not self.config.intrusive:
 			return False
+		if msg.lower().startswith("entweder"):
+			return False
 		choices = self.choice(msg.strip())
 		if choices:
 			send_message(oneof(choices))
