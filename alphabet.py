@@ -11,11 +11,14 @@ class Alphabet(object):
 			self.storage['lastalphabet']
 		except:
 			self.storage['lastalphabet'] = 0
+		self.noalphabet = config.get("modules", "noalphabet").split(",")
 
 	def action(self, msg, nick, send_message):
 		if len(msg) != 1:
 			return False
 		ch = msg[0]
+		if ch in self.noalphabet:
+			return False
 		if ch >= 'a' and ch <= 'z':
 			ch = chr(ord('a') + ((ord(ch) - ord('a')) + 1) % 26)
 			send_message(ch)
@@ -26,6 +29,8 @@ class Alphabet(object):
 			return True
 
 	def __call__(self, msg, nick, send_message):
+		if not self.config.intrusive:
+			return False
 		t = time()
 		if (t - self.storage['lastalphabet']) < \
 				self.config.getint("timeouts", "alphabet"):

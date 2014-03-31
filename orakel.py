@@ -15,6 +15,7 @@ from greet import Greet
 #from expression import Expression
 from actions import Actions
 from storage import Storage
+from flooding import Flooding
 from config import Configuration
 from choice import Choice
 from scripting import Scripting
@@ -58,6 +59,7 @@ if __name__ == "__main__":
 	count = Count(storage, conf)
 	greet = Greet([ x.strip() for x in
 			config.get("modules", "greetings").split(",") ], nick)
+	flooding = Flooding(conf)
 
 	search_engines = load_database(config.get("db", "searchengines"))
 	search = Search(search_engines)
@@ -79,6 +81,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(count)
 	xmpp.add_message_listener(search)
 	xmpp.add_message_listener(greet)
+	xmpp.add_message_listener(flooding)
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
 	xmpp.add_message_listener(actions.passive)
