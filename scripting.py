@@ -335,7 +335,9 @@ class Scripting(object):
 			if ord(c) < 32:
 				return False
 			return True
-		if re.match(r'^\s*[a-zA-Z0-9]+\s*$', msg):
+		if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
+			return False
+		if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
 			return False
 		try:
 			if msg in self.variables:
