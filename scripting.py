@@ -12,6 +12,7 @@ import random
 import traceback
 import signal
 from contextlib import contextmanager
+from utils import oneof
 
 """
 import sys
@@ -206,6 +207,7 @@ class Scripting(object):
 			"dnsquery": dnsquery,
 			"random": random.random,
 			"randrange": random.randrange,
+			"oneof": oneof
 	}
 
 	def __init__(self, storage=None, search_engines={}):
