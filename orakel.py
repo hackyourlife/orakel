@@ -20,6 +20,7 @@ from config import Configuration
 from choice import Choice
 from scripting import Scripting
 from fatfox import FatFox
+from cookies import Cookies
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -68,6 +69,7 @@ if __name__ == "__main__":
 	choice = Choice(conf)
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
+	cookies = Cookies()
 
 	xmpp = Client(jid, password, room, nick)
 	xmpp.register_plugin('xep_0030') # Service Discovery
@@ -84,6 +86,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(flooding)
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
+	xmpp.add_message_listener(cookies)
 	xmpp.add_message_listener(actions.passive)
 	xmpp.add_message_listener(choice)
 	xmpp.add_message_listener(scripting)
