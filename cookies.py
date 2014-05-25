@@ -1,6 +1,7 @@
 # vim:set ts=8 sts=8 sw=8 tw=80 noet:
 
 import re	
+import datetime
 from utils import oneof
 
 class Cookies(object):
@@ -22,8 +23,22 @@ class Cookies(object):
  
 		cookies = ["Bier", "Brownie", "Steak", "Club-Sandwich",
 				"Energy-Drink", "Regenbogen", "Burger", "Wein", "Vanille", 
-				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie" ]
+				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie", "Cola", 
+				"Limo",  "Karamel", "Ananas"]
  
+ 
+ 		now = datetime.datetime.now()
+ 		
+ 		if now.month == 12
+ 			cookies.extend(["Weihnachts", "Zimt"])
+ 		elif now.month == 10
+ 			cookies.extend(["Kürbis"])
+ 		elif now.month == 4
+ 			cookies.extend(["Osterhasen", "Lamm"])
+ 		
+ 		if now.hour >= 16
+ 			cookies.extend(["Bier", "Bier", "Bier"])
+
 		r = r'(?i)^keks für (\w+)!?$'
 		match = re.match(r, msg)
  
