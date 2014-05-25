@@ -22,6 +22,7 @@ from scripting import Scripting
 from fatfox import FatFox
 from cookies import Cookies
 from mute import Mute
+from status import Status
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -53,6 +54,7 @@ if __name__ == "__main__":
 
 	storage = Storage(config.get("db", "storage"))
 
+	status = Status()
 	conf = Configuration(storage, config)
 	questions = load_database(config.get("db", "questions"))
 	msgdb = MessageDatabase(questions)
@@ -73,16 +75,21 @@ if __name__ == "__main__":
 	cookies = Cookies()
 
 	mute = Mute(storage)
+	conf.add_handler('mute', mute.config_handler)
+	conf.add_handler(['show', 'mute'], mute.show_handler)
+	conf.add_handler(['show', 'participants'], status.show_participants)
+	conf.add_handler(['show', 'online', 'users'], status.show_online_users)
 
 	xmpp = Client(jid, password, room, nick)
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
 	xmpp.add_mentation_listener(mute.talk_muted)
-	xmpp.add_message_listener(mute.talk_muted)
 	xmpp.add_mentation_listener(conf)
 	xmpp.add_mentation_listener(msgdb)
 	xmpp.add_mentation_listener(actions.active)
+	xmpp.add_message_listener(mute.talk_muted)
+	xmpp.add_message_listener(conf)
 	xmpp.add_message_listener(pingpong)
 	xmpp.add_message_listener(alphabet)
 	xmpp.add_message_listener(count)
@@ -95,6 +102,10 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(actions.passive)
 	xmpp.add_message_listener(choice)
 	xmpp.add_message_listener(scripting)
+
+	def get_participants():
+		return xmpp.participants
+	status.get_participants = get_participants
 
 	if xmpp.connect():
 		xmpp.process(block=True)

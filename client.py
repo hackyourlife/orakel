@@ -6,6 +6,7 @@ import sleekxmpp
 class Client(sleekxmpp.ClientXMPP):
 	mentation_listeners = []
 	message_listeners = []
+	participants = {}
 
 	def __init__(self, jid, password, room, nick):
 		sleekxmpp.ClientXMPP.__init__(self, jid, password)
@@ -17,6 +18,8 @@ class Client(sleekxmpp.ClientXMPP):
 		self.add_event_handler("groupchat_message", self.muc_message)
 		self.add_event_handler("muc::%s::got_online" % self.room,
 				self.muc_online)
+		self.add_event_handler("muc::%s::got_offline" % self.room,
+				self.muc_offline)
 
 	def add_mentation_listener(self, listener):
 		self.mentation_listeners += [ listener ]
@@ -48,10 +51,20 @@ class Client(sleekxmpp.ClientXMPP):
 
 	def muc_online(self, presence):
 		if presence['muc']['nick'] != self.nick:
-			jid = presence['from'].bare
+			jid = presence['from'].full
 			role = presence['muc']['role']
 			nick = presence['muc']['nick']
+			affiliation = presence['muc']['affiliation']
+			self.participants[jid] = {'jid': jid,
+					'role': role,
+					'nick': nick,
+					'affiliation': affiliation}
 			print("%s: %s [%s]" % (jid, role, nick))
+
+	def muc_offline(self, presence):
+		if presence['muc']['nick'] != self.nick:
+			jid = presence['from'].full
+			del self.participants[jid]
 
 	def send_message(self, msg):
 		sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
