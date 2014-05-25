@@ -21,6 +21,7 @@ from choice import Choice
 from scripting import Scripting
 from fatfox import FatFox
 from cookies import Cookies
+from mute import Mute
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -71,10 +72,14 @@ if __name__ == "__main__":
 	fatfox = FatFox()
 	cookies = Cookies()
 
+	mute = Mute(storage)
+
 	xmpp = Client(jid, password, room, nick)
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
+	xmpp.add_mentation_listener(mute.talk_muted)
+	xmpp.add_message_listener(mute.talk_muted)
 	xmpp.add_mentation_listener(conf)
 	xmpp.add_mentation_listener(msgdb)
 	xmpp.add_mentation_listener(actions.active)
