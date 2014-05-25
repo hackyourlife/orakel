@@ -16,32 +16,32 @@ class Cookies(object):
 			return True
 
 		return False
- 
+
 	def handle(self, msg, nick):
 		users = ["Socke", "Malte", "Fatfox", "Schneck", "SchinkiBa",
 				"T", "tchab", "Koch", "Hacki", "willi", "allen", nick]
- 
+
 		cookies = ["Bier", "Brownie", "Steak", "Club-Sandwich",
 				"Energy-Drink", "Regenbogen", "Burger", "Wein", "Vanille", 
 				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie", "Cola", 
 				"Limo",  "Karamel", "Ananas"]
- 
- 
- 		now = datetime.datetime.now()
- 		
- 		if now.month == 12:
- 			cookies.extend(["Weihnachts", "Zimt"])
- 		elif now.month == 10:
- 			cookies.extend(["Kürbis"])
- 		elif now.month == 4:
- 			cookies.extend(["Osterhasen", "Lamm"])
- 		
- 		if now.hour >= 16:
- 			cookies.extend(["Bier", "Bier", "Bier"])
+
+
+		now = datetime.datetime.now()
+
+		if now.month == 12:
+			cookies.extend(["Weihnachts", "Zimt"])
+		elif now.month == 10:
+			cookies.extend(["Kürbis"])
+		elif now.month == 4:
+			cookies.extend(["Osterhasen", "Lamm"])
+
+		if now.hour >= 16:
+			cookies.extend(["Bier", "Bier", "Bier"])
 
 		r = r'(?i)^keks für (\w+)!?$'
 		match = re.match(r, msg)
- 
+
 		if match:
 			users = [match.group(1)]
 		elif msg.lower() != 'keks?':
