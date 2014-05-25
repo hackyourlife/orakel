@@ -18,10 +18,11 @@ class Cookies(object):
  
 	def handle(self, msg, nick):
 		users = ["Socke", "Malte", "Fatfox", "Schneck", "SchinkiBa",
-				"T", "tchab", "Koch", "Hacki", nick]
+				"T", "tchab", "Koch", "Hacki", "willi", "allen", nick]
  
 		cookies = ["Bier", "Brownie", "Steak", "Club-Sandwich",
-				"Energy-Drink", "Regenbogen"]
+				"Energy-Drink", "Regenbogen", "Burger", "Wein", "Vanille", 
+				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie" ]
  
 		r = r'(?i)^keks für (\w+)!?$'
 		match = re.match(r, msg)
@@ -31,5 +32,5 @@ class Cookies(object):
 		elif msg.lower() != 'keks?':
 			return False
 
-		return "/me gibt %s einen %s-Keks" % (oneof(users),
+		return "/me gibt %s einen %s-Keks." % (oneof(users),
 				oneof(cookies))
