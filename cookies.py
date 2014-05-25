@@ -29,14 +29,14 @@ class Cookies(object):
  
  		now = datetime.datetime.now()
  		
- 		if now.month == 12
+ 		if now.month == 12:
  			cookies.extend(["Weihnachts", "Zimt"])
- 		elif now.month == 10
+ 		elif now.month == 10:
  			cookies.extend(["Kürbis"])
- 		elif now.month == 4
+ 		elif now.month == 4:
  			cookies.extend(["Osterhasen", "Lamm"])
  		
- 		if now.hour >= 16
+ 		if now.hour >= 16:
  			cookies.extend(["Bier", "Bier", "Bier"])
 
 		r = r'(?i)^keks für (\w+)!?$'
