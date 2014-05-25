@@ -39,12 +39,14 @@ class Cookies(object):
 		if now.hour >= 16:
 			cookies.extend(["Bier", "Bier", "Bier"])
 
-		r = r'(?i)^keks für (\w+)!?$'
+		r = r'(?i)^keks für (\w+)(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
 			users = [match.group(1)]
-		elif msg.lower() != 'keks?':
+			if match.group(2) == '?':
+				return 'nein!'
+		elif not msg.lower() in ['keks', 'keks?', 'keks!']:
 			return False
 
 		return "/me gibt %s einen %s-Keks." % (oneof(users),
