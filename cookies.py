@@ -1,6 +1,6 @@
 # vim:set ts=8 sts=8 sw=8 tw=80 noet:
 
-import re	
+import re
 import datetime
 from utils import oneof
 
@@ -18,13 +18,13 @@ class Cookies(object):
 		return False
 
 	def handle(self, msg, nick):
-		users = ["Socke", "Malte", "Fatfox", "Schneck", "SchinkiBa",
+		users = ["Socke", "Malte", "Fatfox", "Schneck", "thomasba",
 				"T", "tchab", "Koch", "Hacki", "willi", "allen", nick]
 
 		cookies = ["Bier", "Brownie", "Steak", "Club-Sandwich",
-				"Energy-Drink", "Regenbogen", "Burger", "Wein", "Vanille", 
-				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie", "Cola", 
-				"Limo",  "Karamel", "Ananas"]
+				"Energy-Drink", "Regenbogen", "Burger", "Wein", "Vanille",
+				"Lima", "Wolken", "Schoko", "Erdbeer", "Veggie", "Cola",
+				"Limo",  "Karamel", "Ananas", "Schinken"]
 
 
 		now = datetime.datetime.now()
