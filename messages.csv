@@ -17,6 +17,9 @@ subdomain;https://www.lima-city.de/usercp/subdomains
 subdomains;https://www.lima-city.de/usercp/subdomains
 domain;https://www.lima-city.de/usercp/domains
 domains;https://www.lima-city.de/usercp/domains
+websites;https://www.lima-city.de/usercp/websites
+stats;https://www.lima-city.de/usercp/websites/statistics
+statistics;https://www.lima-city.de/usercp/websites/statistics
 avatar;https://www.lima-city.de/usercp/page%3Aavatar
 regeln;https://www.lima-city.de/hilfe/welche-allgemeinen-regeln-gibt-es
 werbefreiheit;https://www.lima-city.de/2008/werbefreiheit
