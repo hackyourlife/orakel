@@ -348,7 +348,11 @@ class Scripting(object):
 				result = self.evaluate(msg)
 			if result:
 				if ("'%s'" % result) == msg or \
-						('"%s"' % result) == msg:
+						('"%s"' % result) == msg or \
+						("'%s'" % result) == \
+							msg.strip() or \
+						('"%s"' % result) == \
+							msg.strip():
 					return False
 				result = [ c for c in str(result)
 						if allowed(c) ]
