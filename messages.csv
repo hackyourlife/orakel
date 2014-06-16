@@ -35,7 +35,7 @@ auktionen;https://www.lima-city.de/auctions
 ticket;https://www.lima-city.de/usercp/tickets/
 talkr;http://jabber.lima-city.de/
 webchat;http://jabber.lima-city.de/
-rm;https://www.lima-city.de/usercp/page%3Adelete
+rm;https://www.lima-city.de/usercp/delete-account
 delete;https://www.lima-city.de/usercp/page%3Adelete
 phpinfo;http://system.lima-city.de/info.php
 paste;http://paste42.de/
