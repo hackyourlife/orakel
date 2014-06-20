@@ -45,6 +45,8 @@ class Configuration(object):
 	def passive_config(self, msg, nick, send_message):
 		parts = [ x.strip() for x in msg.strip().split(' ') if
 				x.strip() != '' ]
+		if len(parts) == 0:
+			return False
 		command = parts[0]
 		undo = False
 		data = parts[1:]
