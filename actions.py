@@ -119,6 +119,8 @@ class Actions(object):
 		return time(datetime.datetime.now())
 
 	def ping(self, addr):
+		if len(addr.strip()) == 0:
+			return "pong"
 		addr = addr.split(" ")[0].strip()
 		try:
 			result = icmplib.ping(addr)
