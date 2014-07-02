@@ -77,6 +77,7 @@ def dnsquery(domain, record='A'):
 		raise Exception('permission denied')
 	resolver = dns.resolver.Resolver()
 	resolver.nameservers = [ '8.8.8.8', '8.8.4.4' ]
+	resolver.lifetime = 5
 	result = [ str(x) for x in resolver.query(domain, record) ]
 	return result
 
@@ -362,6 +363,12 @@ class Scripting(object):
 				return True
 		except SyntaxError:
 			pass
+		except dns.resolver.NXDOMAIN:
+			send_message('Exception: NXDOMAIN')
+			return True
+		except dns.exception.Timeout:
+			send_message('Exception: timeout')
+			return True
 		except:
 			print("%s: '%s'" % (nick, msg))
 			traceback.print_exc()
