@@ -102,10 +102,12 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(actions.passive)
 	xmpp.add_message_listener(choice)
 	xmpp.add_message_listener(scripting)
+	xmpp.add_online_listener(mute.on_online)
 
 	def get_participants():
 		return xmpp.participants
 	status.get_participants = get_participants
+	mute.set_role = xmpp.set_role
 
 	if xmpp.connect():
 		xmpp.process(block=True)

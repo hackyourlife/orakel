@@ -9,6 +9,7 @@ class Mute(object):
 		if not nick in self.muted:
 			self.muted += [ nick ]
 		self.storage['muted'] = self.muted
+		self.set_role(nick, 'visitor')
 
 	def unmute(self, nick):
 		if not nick in self.muted:
@@ -16,6 +17,7 @@ class Mute(object):
 		index = self.muted.index(nick)
 		del self.muted[index]
 		self.storage['muted'] = self.muted
+		self.set_role(nick, 'participant')
 
 	def is_muted(self, nick):
 		return nick in self.muted
@@ -24,6 +26,10 @@ class Mute(object):
 		if nick in self.muted:
 			return True
 		return False
+
+	def on_online(self, nick, role, send_message):
+		if nick in self.muted:
+			self.set_role(nick, 'visitor')
 
 	def show_handler(self, *args, **keywords):
 		send_message = keywords['send_message']
