@@ -75,6 +75,7 @@ if __name__ == "__main__":
 	cookies = Cookies()
 
 	mute = Mute(storage)
+
 	conf.add_handler('mute', mute.config_handler)
 	conf.add_handler(['show', 'mute'], mute.show_handler)
 	conf.add_handler(['show', 'participants'], status.show_participants)

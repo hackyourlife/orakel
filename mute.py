@@ -39,10 +39,12 @@ class Mute(object):
 
 	def config_handler(self, undo, *args, **keywords):
 		send_message = keywords['send_message']
-		if len(args) != 1:
+		if len(args) == 0:
 			print("args: %s" % args)
 			return
-		nick = args[0]
+		nick = " ".join(args)
+		if nick == keywords['nick']:
+			return
 		if undo:
 			if self.is_muted(nick):
 				self.unmute(nick)

@@ -2,6 +2,7 @@
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
 from utils import startswith
+from op import Operators
 
 class Configuration(object):
 	def __init__(self, storage, config):
@@ -17,6 +18,10 @@ class Configuration(object):
 		for i in ['intrusive']:
 			if not i in self.values:
 				self.values[i] = False
+
+		self.op = Operators(storage, config.get("modules", "op"))
+		self.add_handler('op', self.op.config_handler)
+		self.add_handler(['show', 'op'], self.op.show_handler)
 
 	def add_handler(self, command, handler=None):
 		info = []
@@ -39,6 +44,8 @@ class Configuration(object):
 			send_message(':)')
 			return True
 		else:
+			if not self.op.is_op(nick):
+				return False
 			return self.passive_config(msg, nick, send_message)
 		return False
 
@@ -50,7 +57,8 @@ class Configuration(object):
 		command = parts[0]
 		undo = False
 		data = parts[1:]
-		args = {'send_message': send_message, 'cmdline': msg.strip() }
+		args = {'send_message': send_message, 'cmdline': msg.strip(),
+				'nick': nick }
 		if command == 'no':
 			undo = True
 			command = parts[1]
