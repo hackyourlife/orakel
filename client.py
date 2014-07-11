@@ -60,9 +60,10 @@ class Client(sleekxmpp.ClientXMPP):
 	def message(self, msg):
 		if msg['type'] in ('chat', 'normal'):
 			text = msg['body']
-			nick = None
+			jid = msg['from']
+			log.info("[PRIVATE] %s: '%s'" % (jid, text))
 			for listener in self.mentation_listeners:
-				if listener(text, nick, self.send_message):
+				if listener(text, jid, self.send_message):
 					break
 			#msg.reply("Thanks for sending\n%(body)s" % msg).send()
 
