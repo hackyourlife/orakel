@@ -20,6 +20,7 @@ class Client(sleekxmpp.ClientXMPP):
 
 		self.add_event_handler("session_start", self.start)
 		self.add_event_handler("groupchat_message", self.muc_message)
+		self.add_event_handler("message", self.message)
 		self.add_event_handler("muc::%s::got_online" % self.room,
 				self.muc_online)
 		self.add_event_handler("muc::%s::got_offline" % self.room,
@@ -55,6 +56,15 @@ class Client(sleekxmpp.ClientXMPP):
 					if listener(msg['body'], nick,
 							self.send_message):
 						break
+
+	def message(self, msg):
+		if msg['type'] in ('chat', 'normal'):
+			text = msg['body']
+			nick = None
+			for listener in self.mentation_listeners:
+				if listener(text, nick, self.send_message):
+					break
+			#msg.reply("Thanks for sending\n%(body)s" % msg).send()
 
 	def muc_online(self, presence):
 		if presence['muc']['nick'] != self.nick:
