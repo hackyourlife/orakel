@@ -5,6 +5,7 @@ url erstellen ticket;wie kann ich ein Ticket erstellen?
 url ftp;wie kommt man auf ftp
 url ftp;wo finde ich mein ftp passwort
 url ftp;wo finde ich meine FTP-Zugangsdaten
+unbekannt;was ist der pfad meines ftp verzeichnisses?
 url domain aufschalten;Wie schalte ich eine Domain bei lima-city auf?
 url account löschen;wie kann man sich hier löschen?
 url account löschen;wie kann man seinen Account hier löschen?
@@ -12,20 +13,22 @@ url ftp;hi wie kom ich zum ftp server?
 url domain umziehen;Mir gehört eine Domain, wie kann ich damit zu lima-city umziehen?
 #hilfe domain;wo kann ich infos bzgl. ARecord/MX/CNAME bekommen?
 webspace verboten inhalte;man kann keine videos speichern ?
-lernen html;wie erstellt man eine website?
+lernen html css;wie erstellt man eine website?
+lernen html css;Wie erstellt man hier eine Homepage?
+lernen html css;Wie kann man hier eine Homepage erstellen?
+lernen html css;wie kann man hier eine Homepage machen?
+lernen html css;wie kann ich hier eine Homepage machen?
+lernen html css;wie kann ich hier eine Homepage erstellen?
 können ersteigern;sagt mal hat man den hier keine freie datenbank?
 metafrage;kennt sich hier jemand mit jquery aus?
 metafrage;weis einer wie mann die website hochladet
-metafrage;hallo jemand da
-metafrage;Morgen , ist jemand da?
-metafrage;ist jemand da?
-metafrage;hey jemand da ?
-metafrage;jemand da?
 metafrage;hallo jemand kennen sich wordpress aus tuen?
+metafrage;Kennt sich jemand mit PHP aus? :S Bräuchte Hilfe..
 metafrage;ist der burgi hier?
 metafrage;ist der burgi da?
 metafrage;ist burgi da?
 metafrage;ist burgi hier?
+metafrage;hey kennt sich einer von euch mit joomla und lima city aus?
 #metafrage;Hey? Kennt sich einer von euch bisschen mit TV-Empfang aus?
 down;ist eure Homepage auch noch down?
 down;hat jemand anderes auch Probleme mit der Website?
@@ -40,12 +43,10 @@ down;Hallo kann keine FTP-Verbindung herstellen gibt es ein Problem?
 down;kann es sein das phpMyAdmin gerade down ist?
 down;kann das sein das lima city grad sehr langsam ist?
 down;Sind die Server down?
-online knight;ist hier ein admin im chat?
 fragen;Hey brauche hilfe
 fragen;habe ne frage, könnt ihr mir kurz helfen?
 fragen;kann mir einer helfen, wegen unbegrenzten traffic für webspace?
 fragen;ich hab probleme mit mein FTP Daten an wem muss ich mich da melden
-fragen;hey kennt sich einer von euch mit joomla und lima city aus?
 fragen;hat jemand erfahrung mit meia wiki?
 fragen;Jemand da der Ahnung hat
 fragen;hallo kann jemand mir helfen
@@ -57,7 +58,6 @@ fragen;Ich habe ein Problem
 fragen;Hallo, ich habe mal eine Frage
 fragen;kann mir jemand helfen?
 fragen;ich habe ein Problem
-fragen;Kennt sich jemand mit PHP aus? :S Bräuchte Hilfe..
 ja;Erlaubt Lima-City .htacced Weiterleitungen?
 ja;Kann man hier eigene html Dateien Hochladen?
 ja;Kann ich bei Lima-City auch mein eigenen Domain aufschalten?
@@ -81,8 +81,14 @@ ftp;wie kann ich sachen auf die seite hochladen?
 zurücksetzen passwort;wie bekomme ich meinen FTP zugang zurück?
 webspace aufrufen;wie kann ich wordpress starten wenn ich es installiert habe?
 was fehlermeldung;mein ftp geht net
+online knight;ist hier ein admin im chat?
 online knight;ist ein knight on?
 online;hallo, wer hier?
+online;hallo jemand da
+online;Morgen , ist jemand da?
+online;ist jemand da?
+online;hey jemand da ?
+online;jemand da?
 ticket;warum ist mein webspace gesperrt
 einzelschicksal;Ich finde es (blöd) das man sein datenbank kaufen muss
 können ersteigern;muss man jetzt ehrlich eine datenbank kaufen ?
@@ -92,7 +98,6 @@ möglich;Kann das sein das Lima-City spinnt?
 unbekannt;hallo wie lange dauert den so ne Ticket anfrage?
 unbekannt;wann weis ich das ich auf meine domain kann
 unbekannt;was geht denn hier ab
-unbekannt;Wie erstellt man hier eine Homepage?
 unbekannt;mein komplettes verzeichnis ist leer
 #unbekannt;Wie kann ich mich ausloggen ?
 unbekannt;ich kann net auf mein ftp daten zugreifen

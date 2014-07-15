@@ -3,7 +3,6 @@ datenbank;db
 mein;meine;meinen;meiner
 machen;mache;mach;tu;tun
 verbindungsproblem;verbindungsprobleme
-verzeichnis;verzeichnisse
 webseite;website;homepage;hompage;webside
 weiterleitung;weiterleitungen
 kosten;kostet
@@ -26,7 +25,7 @@ erstellen;erstellt;anlegen;angelegt
 essen;futter
 finden;finde
 haben;habt;habe;hab
-hallo;hey;hi;moin;moinsen;morgen;ahoi;aloha;tach;tag
+hallo;hey;hi;moin;moinsen;morgen;ahoi;aloha;tach;tag;huhu
 hochgeladen;hochgeladenen
 hochladen;hochladet
 in;im
@@ -51,6 +50,7 @@ ts;teamspeak
 unbegrenzt;unbegrenztem;unbegrenzten;unlimitiert;unlimitiertem;unlimitierten
 verbindung;verbinden;verbunden
 verschieben;verschoben;verschob
+verzeichnis;verzeichnisse;verzeichnisses;ordner
 video;videos
 vorlage;vorlagen
 weiß;weis

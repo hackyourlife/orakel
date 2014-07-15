@@ -71,6 +71,8 @@ class Language(object):
 		data = [ self.map(x) for x in thought if self.has(x) ]
 		#if len(thought) != len(data):
 		#	print("'%s' => '%s'" % (text, self.synthesize(data)))
+		if len(thought) == 0:
+			raise Exception('i did not understand: "%s"' % text)
 		if float(len(data)) / float(len(thought)) < 0.66:
 			raise Exception('i did not understand: "%s" -> %s' \
 					% (text, self.synthesize(data)))

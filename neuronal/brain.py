@@ -6,7 +6,7 @@ from pybrain.structure import SigmoidLayer
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 import pickle
-import functools
+#import functools
 
 #from pybrain.tools.xml.networkreader import NetworkReader, NetworkWriter
 
@@ -19,7 +19,9 @@ class Brain(object):
 		word_count = len(lang)
 		thought_count = len(thoughts)
 		self.translate = Translate(thoughts, messages)
-		self.nn = buildNetwork(word_count, 2 * word_count, thought_count, bias=True, hiddenclass=SigmoidLayer)
+		self.nn = buildNetwork(word_count, 4 * word_count,
+				thought_count, bias=True,
+				hiddenclass=SigmoidLayer)
 		#in_layer = LinearLayer(words)
 		#hidden_layer_01 = SigmoidLayer(int(1.5 * words))
 		#hidden_layer_02 = SigmoidLayer(int(1.5 * words))
@@ -56,7 +58,8 @@ class Brain(object):
 
 	def buildOutput(self, text):
 		thought = self.thoughts.parse(text)
-		data = [ 1 if t in thought else -1 for t in range(len(self.thoughts)) ]
+		data = [ 1 if t in thought else -1 \
+				for t in range(len(self.thoughts)) ]
 		return data
 
 	def buildText(self, data):
@@ -65,7 +68,9 @@ class Brain(object):
 		#		print("%i: %f" % (t, data[t]))
 		#out = sorted([ t for t in range(len(data)) if data[t] > 1.5 ], key=functools.cmp_to_key(lambda x, y: data[x] - data[y]))
 		out = [ t for t in range(len(data)) if data[t] > 0.75 ]
-		result = self.thoughts.synthesize(out) + " (%s)" % ",".join([ "%1.2f" % data[t] for t in out ])
+		#result = self.thoughts.synthesize(out) + " (%s)" \
+		#		% ",".join([ "%1.2f" % data[t] for t in out ])
+		result = self.thoughts.synthesize(out)
 		return result
 
 	def process(self, text):
@@ -84,14 +89,16 @@ class Brain(object):
 	def multilearn(self, data):
 		ds = SupervisedDataSet(len(self.lang), len(self.thoughts))
 		for text in data:
-			ds.addSample(self.buildInput(text), self.buildOutput(data[text]))
+			ds.addSample(self.buildInput(text),
+					self.buildOutput(data[text]))
 		#trainer = BackpropTrainer(self.nn, ds)
-		trainer = BackpropTrainer(self.nn, ds, momentum=0.1, verbose=False, weightdecay=0.01)
+		trainer = BackpropTrainer(self.nn, ds, momentum=0.1,
+				verbose=False, weightdecay=0.01)
 		#return trainer.trainUntilConvergence()
 		error = trainer.train()
 		import sys
-		while error > self.error:
-		#for i in range(30):
+		#while error > self.error:
+		for i in range(50):
 			sys.stdout.write(".")
 			sys.stdout.flush()
 			error = trainer.train()
@@ -114,11 +121,14 @@ class Translate(object):
 		self.messages = messages
 
 	def translate(self, thought):
+		if len(thought) == 0:
+			return None
 		t = set(self.thoughts.parse(thought))
 		for name in self.messages:
 			keys = self.thoughts.parse(name)
 			common = list(t.intersection(keys))
-			if (len(common) == len(t)) and (len(common) == len(keys)):
+			if (len(common) == len(t)) \
+					and (len(common) == len(keys)):
 				return self.messages[name]
 		return None
 

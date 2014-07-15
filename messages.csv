@@ -7,7 +7,7 @@ ftp;https://www.lima-city.de/usercp/ftp
 mysql;https://www.lima-city.de/usercp/databases
 pma;http://mysql.lima-city.de/
 phpmyadmin;http://mysql.lima-city.de/
-filemanager;http://filemanager.lima-city.de/
+filemanager;https://filemanager.lima-city.de/
 mail;https://mail.lima-city.de
 email;https://www.lima-city.de/hilfe/wie-kann-ich-meine-e-mail-adressen-einrichten
 postfach;https://www.lima-city.de/postoffice
@@ -34,8 +34,8 @@ auktion;https://www.lima-city.de/auctions
 auktionen;https://www.lima-city.de/auctions
 ticket;https://www.lima-city.de/usercp/tickets/
 tickets;https://www.lima-city.de/usercp/tickets/
-talkr;http://jabber.lima-city.de/
-webchat;http://jabber.lima-city.de/
+talkr;https://jabber.lima-city.de/
+webchat;https://jabber.lima-city.de/
 rm;https://www.lima-city.de/usercp/delete-account
 delete;https://www.lima-city.de/usercp/page%3Adelete
 phpinfo;http://system.lima-city.de/info.php

@@ -83,7 +83,11 @@ if __name__ == "__main__":
 		brain.save(f)
 
 	def do(x):
-		print("%s -> %s" % (x, brain.process(x)))
+		try:
+			print("%s -> %s" % (x, brain.process(x)))
+		except Exception as e:
+			print("ERROR: '%s' (%s)" % (x, e))
+			raise e
 
 	for x in [
 			"wie kann ich ein Ticket erstellen?",
