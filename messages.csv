@@ -10,8 +10,8 @@ phpmyadmin;http://mysql.lima-city.de/
 filemanager;https://filemanager.lima-city.de/
 mail;https://mail.lima-city.de
 email;https://www.lima-city.de/hilfe/wie-kann-ich-meine-e-mail-adressen-einrichten
-postfach;https://www.lima-city.de/postoffice
-postfächer;https://www.lima-city.de/postoffice
+postfach;https://www.lima-city.de/usercp/email
+postfächer;https://www.lima-city.de/usercp/email
 gulden;https://www.lima-city.de/hilfe/was-sind-gulden
 subdomain;https://www.lima-city.de/usercp/subdomains
 subdomains;https://www.lima-city.de/usercp/subdomains
