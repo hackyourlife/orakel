@@ -6,6 +6,9 @@ antwortet auf einige Fragen und reagiert auf manche Ereignisse.
 
 Konfiguration
 =============
+
+Über die Datei 'orakel.cfg' wird der Bot konfiguriert:
+
 ```
 [xmpp]
 jid = username@jabber.lima-city.de
