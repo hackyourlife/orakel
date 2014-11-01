@@ -17,7 +17,7 @@ class Finder(object):
 
 
 	def finder(self, msg, nick):
-		question = pypygo.query(msg)
+		question = pypygo.query(msg[6:])
 		print(question.abstract)
 		return(question.abstract_url)
 
