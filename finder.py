@@ -17,7 +17,12 @@ class Finder(object):
 
 
 	def finder(self, msg, nick):
-		question = pypygo.query(msg[6:])
-		print(question.abstract)
-		return(question.abstract_url)
+		result = ""
+		try:
+			question = pypygo.query(msg[6:])
+			result = question.abstract_text[0:100] + "... [" +question.abstract_url + "]"
+		finally:
+			if len(result) < 1:
+				result = "Ich konnte leider nichts finden. :("
+			return(result)
 
