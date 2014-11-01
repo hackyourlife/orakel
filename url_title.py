@@ -50,7 +50,6 @@ class Urltitle(object):
 				return saved_urls[0]
 			else:
 				return ', '.join(saved_urls)
-		finally:
-			self.storage['last_urls'] = []
+		finally: self.storage['last_urls'] = []
 
 		return False
