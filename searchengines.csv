@@ -2,9 +2,9 @@ google;https://www.google.com/search?q=%s
 lima;https://www.lima-city.de/search/%s
 ddg;https://duckduckgo.com/?q=%s
 php;http://php.net/%s
-wikide;https://de.wikipedia.org/w/index.php?search=%s&title=Spezial%%3ASuche&go=Artikel
-wiki;https://de.wikipedia.org/w/index.php?search=%s&title=Spezial%%3ASuche&go=Artikel
-wikien;https://en.wikipedia.org/w/index.php?search=%s&title=Spezial%%25253ASuche&go=Artikel
+wikide;https://de.wikipedia.org/w/index.php?search=%s
+wiki;https://de.wikipedia.org/w/index.php?search=%s
+wikien;https://en.wikipedia.org/w/index.php?search=%s
 mdn;https://developer.mozilla.org/en-US/search?q=%s
 caniuse;http://caniuse.com/#search=%s
 youtube;https://www.youtube.com/results?search_query=%s
