@@ -2,7 +2,7 @@
 jid = account@jabber.server
 password = secret
 room = room@jabber.server
-nick = Schrottding 
+nick = orakel
 
 [db]
 questions = messages.csv
