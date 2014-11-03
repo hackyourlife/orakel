@@ -75,7 +75,7 @@ if __name__ == "__main__":
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
 	cookies = Cookies()
-	urltitle = Urltitle(storage)
+	urltitle = Urltitle()
 	finder = Finder()
 
 	mute = Mute(storage)
