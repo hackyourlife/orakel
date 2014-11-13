@@ -43,6 +43,8 @@ class Client(sleekxmpp.ClientXMPP):
 	def muc_message(self, msg):
 		nick = msg['mucnick']
 		if nick != self.nick:
+			if len(msg['body']) == 0:
+				return
 			if msg['body'].startswith(self.nick):
 				if len(msg['body']) <= len(self.nick) + 2:
 					return
@@ -61,6 +63,8 @@ class Client(sleekxmpp.ClientXMPP):
 		if msg['type'] in ('chat', 'normal'):
 			text = msg['body']
 			jid = msg['from']
+			if len(text) == 0:
+				return
 			log.info("[PRIVATE] %s: '%s'" % (jid, text))
 			for listener in self.mentation_listeners:
 				if listener(text, jid, self.send_message):
