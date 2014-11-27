@@ -48,6 +48,8 @@ class Cookies(object):
 			users = [match.group(2)]
 			if match.group(2) == "tchab":
 				cookies = ["Regenbogen", "Wurst"]
+			elif match.group(2) in ["sonok", "snook", "Socke"]:
+				cookies = ["Nudel", "Ketchup", "Nudel-Ketchup"]
 			if not match.group(1) is None:
 				cookie = match.group(1)[:-1].split('-')
 				cookie = [x[0].upper() + x[1:].lower() \
