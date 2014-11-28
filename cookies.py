@@ -50,6 +50,8 @@ class Cookies(object):
 				cookies = ["Regenbogen", "Wurst"]
 			elif match.group(2) in ["sonok", "snook", "Socke"]:
 				cookies = ["Nudel", "Ketchup", "Nudel-Ketchup"]
+			elif match.group(2) in ["c143", "tse143", "tse", "c143po"]:
+				cookies = ["Bier", "Pizza", "Kartoffel", "Tofu", "Salat", "Imaginären"]
 			if not match.group(1) is None:
 				cookie = match.group(1)[:-1].split('-')
 				cookie = [x[0].upper() + x[1:].lower() \
