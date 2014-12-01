@@ -2,3 +2,5 @@
 *.pyc
 *.swp
 orakel.cfg
+.idea
+storage.json

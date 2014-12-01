@@ -23,6 +23,8 @@ from fatfox import FatFox
 from cookies import Cookies
 from mute import Mute
 from status import Status
+from url_title import Urltitle
+from finder import Finder
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -73,6 +75,8 @@ if __name__ == "__main__":
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
 	cookies = Cookies()
+	#urltitle = Urltitle()
+	#finder = Finder()
 
 	mute = Mute(storage)
 
@@ -100,10 +104,12 @@ if __name__ == "__main__":
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
 	xmpp.add_message_listener(cookies)
+	#xmpp.add_message_listener(urltitle)
 	xmpp.add_message_listener(actions.passive)
 	xmpp.add_message_listener(choice)
 	xmpp.add_message_listener(scripting)
 	xmpp.add_online_listener(mute.on_online)
+	#xmpp.add_message_listener(finder)
 
 	def get_participants():
 		return xmpp.participants
