@@ -20,6 +20,7 @@ from config import Configuration
 from choice import Choice
 from scripting import Scripting
 from fatfox import FatFox
+from burgi import Burgi
 from cookies import Cookies
 from mute import Mute
 from status import Status
@@ -74,6 +75,7 @@ if __name__ == "__main__":
 	choice = Choice(conf)
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
+	burgi = Burgi()
 	cookies = Cookies()
 	#urltitle = Urltitle()
 	#finder = Finder()
@@ -103,6 +105,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(flooding)
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
+	xmpp.add_message_listener(burgi)
 	xmpp.add_message_listener(cookies)
 	#xmpp.add_message_listener(urltitle)
 	xmpp.add_message_listener(actions.passive)
