@@ -26,6 +26,7 @@ from mute import Mute
 from status import Status
 from url_title import Urltitle
 from finder import Finder
+from hands import Hands
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -79,7 +80,7 @@ if __name__ == "__main__":
 	cookies = Cookies()
 	#urltitle = Urltitle()
 	#finder = Finder()
-
+	hands = Hands(storage, conf)
 	mute = Mute(storage)
 
 	conf.add_handler('mute', mute.config_handler)
@@ -113,6 +114,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(scripting)
 	xmpp.add_online_listener(mute.on_online)
 	#xmpp.add_message_listener(finder)
+	xmpp.add_message_listener(hands)
 
 	def get_participants():
 		return xmpp.participants
