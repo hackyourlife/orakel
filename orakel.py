@@ -80,7 +80,7 @@ if __name__ == "__main__":
 	cookies = Cookies()
 	#urltitle = Urltitle()
 	#finder = Finder()
-	hands = Hands(storage, conf)
+	hands = Hands(storage, conf, config.get("modules", "hands"))
 	mute = Mute(storage)
 
 	conf.add_handler('mute', mute.config_handler)
