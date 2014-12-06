@@ -10,7 +10,7 @@ class Burgi(object):
 		return False
 
 	def handle(self, msg, nick):
-		if nick == 'burgi' or 'burgi_mobile':
+		if nick == 'burgi' or 'local _@_/°':
 			if '*' in msg:
 				if 'duck' in msg or 'duckt' in msg:
 					return '/me holt Burgi zurück und verstreut Schnecken-Gift'
