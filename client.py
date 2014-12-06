@@ -52,14 +52,18 @@ class Client(sleekxmpp.ClientXMPP):
 
 	def muc_message(self, msg):
 		nick = msg['mucnick']
-		jid = self.plugin['xep_0045'].getJidProperty(self.room, nick,
-				'jid').full
-		if len(jid) == 0:
-			jid = msg['from'].full
-		role = self.plugin['xep_0045'].getJidProperty(self.room, nick,
-				'role')
-		affiliation = self.plugin['xep_0045'].getJidProperty(self.room,
-				nick, 'affiliation')
+		jid = msg['from'].full
+		role = None
+		affiliation = None
+		if len(nick) != 0:
+			jid = self.plugin['xep_0045'].getJidProperty(self.room,
+					nick, 'jid').full
+			if len(jid) == 0:
+				jid = msg['from'].full
+			role = self.plugin['xep_0045'].getJidProperty(self.room,
+					nick, 'role')
+			affiliation = self.plugin['xep_0045'].getJidProperty(
+					self.room, nick, 'affiliation')
 		if nick != self.nick:
 			if not self.online:
 				return
@@ -70,12 +74,14 @@ class Client(sleekxmpp.ClientXMPP):
 					return
 				text = msg['body'][len(self.nick) + 1:].strip()
 				for listener in self.mention_listeners:
-					listener(text, nick, jid, role,
-							affiliation)
+					listener(msg=text, nick=nick, jid=jid,
+							role=role,
+							affiliation=affiliation)
 			else:
 				for listener in self.message_listeners:
-					listener(msg['body'], nick, jid, role,
-							affiliation)
+					listener(msg=msg['body'], nick=nick,
+							jid=jid, role=role,
+							affiliation=affiliation)
 
 	def message(self, msg):
 		if msg['type'] in ('chat', 'normal'):
@@ -85,7 +91,7 @@ class Client(sleekxmpp.ClientXMPP):
 				return
 			log.info("[PRIVATE] %s: '%s'" % (jid, text))
 			for listener in self.private_listeners:
-				listener(text, jid)
+				listener(msg=text, jid=jid)
 
 	def muc_online(self, presence):
 		if presence['muc']['nick'] != self.nick:
@@ -104,7 +110,8 @@ class Client(sleekxmpp.ClientXMPP):
 			if not self.online:
 				return
 			for listener in self.online_listeners:
-				listener(fulljid, nick, role, affiliation)
+				listener(jid=fulljid, nick=nick, role=role,
+						affiliation=affiliation)
 		else:
 			self.online = True
 
@@ -115,7 +122,7 @@ class Client(sleekxmpp.ClientXMPP):
 			fulljid = self.participants[jid]['jid']
 			del self.participants[jid]
 			for listener in self.offline_listeners:
-				listener(fulljid, nick)
+				listener(jid=fulljid, nick=nick)
 
 	def muc_send(self, msg):
 		sleekxmpp.ClientXMPP.send_message(self, mto=self.room,

@@ -47,7 +47,9 @@ if __name__ == "__main__":
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
-	xmpp.add_message_listener(brain)
+	def do_brain(nick, msg, **keywords):
+		brain(msg, nick, xmpp.muc_send)
+	xmpp.add_message_listener(do_brain)
 	if xmpp.connect():
 		xmpp.process(block=True)
 	else:
