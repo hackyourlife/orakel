@@ -153,9 +153,17 @@ class Module(object):
 				body=json.dumps(data).encode('utf-8'))
 
 	def start(self):
+		for listener in self.listeners:
+			listener.start()
+		if self.parent:
+			return
 		self.channel.start_consuming()
 
 	def stop(self):
+		for listener in self.listeners:
+			listener.stop()
+		if self.parent:
+			return
 		self.connection.close()
 
 	# override those functions

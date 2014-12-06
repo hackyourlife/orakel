@@ -30,6 +30,11 @@ class Storage(Module):
 						value=self.__getitem__(key))
 			else:
 				self.publish_all()
+		elif cmd == 'init_config':
+			key = keywords['key']
+			value = keywords['value']
+			if not key in self.values:
+				self.__setitem__(key, value)
 
 	def config_change(self, key, value):
 		self.log.debug("config change: '%s'='%s'" % (key, value))

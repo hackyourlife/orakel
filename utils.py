@@ -26,3 +26,30 @@ def load_database(filename):
 			value = ";".join(parts[1:]).strip()
 			database[key] = value
 	return database
+
+def parse(line):
+	tokens = []
+	token = []
+	instring = False
+
+	for i in range(len(line)):
+		c = line[i]
+		if instring:
+			if c == '"':
+				instring = False
+			else:
+				token += [c]
+		elif c == '"':
+			instring = True
+		elif c in ['\t', '\r', '\n', ' ']:
+			if len(token) != 0:
+				tokens += [ "".join(token) ]
+				token = []
+		else:
+			token += [c]
+	if instring:
+		raise SyntaxError("missing dquote")
+	if len(token) != 0:
+		tokens += [ "".join(token) ]
+
+	return tokens

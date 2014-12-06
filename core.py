@@ -10,6 +10,7 @@ from msgdatabase import MessageDatabase
 from search import Search
 from pingpong import PingPong
 from flooding import Flooding
+from cli import CLI
 
 class Core(Module):
 	def __init__(self, questions, search_engines, storage, maxlength,
@@ -20,6 +21,7 @@ class Core(Module):
 		self.search = Search(search_engines, parent=self)
 		self.pingpong = PingPong(parent=self)
 		self.flooding = Flooding(maxlength, paste, parent=self)
+		self.cli = CLI(parent=self)
 		self.log.info("load complete")
 
 if __name__ == "__main__":
