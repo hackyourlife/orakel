@@ -140,6 +140,10 @@ class Client(sleekxmpp.ClientXMPP):
 				mtype='chat')
 
 	def set_role(self, nick, role):
+		if not self.is_participant(nick):
+			self.log.warn("trying to change role of non-existent" \
+					" user '%s'" % nick)
+			return False
 		self.log.info("setting role for %s to %s" % (nick, role))
 		return self.plugin['xep_0045'].setRole(self.room, nick, role)
 
