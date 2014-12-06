@@ -202,6 +202,7 @@ class Scripting(object):
 			"utc": utcnow,
 			"date": date,
 			"time": time,
+			"isotime" : isotime,
 			"uuid": uuid,
 			"ping": ping,
 			"alive": alive,
