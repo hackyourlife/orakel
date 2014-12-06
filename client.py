@@ -5,7 +5,6 @@ import sleekxmpp
 from sleekxmpp.xmlstream import ET
 import logging
 
-log = logging.getLogger(__name__)
 
 class Client(sleekxmpp.ClientXMPP):
 	mention_listeners = []
@@ -15,12 +14,18 @@ class Client(sleekxmpp.ClientXMPP):
 	offline_listeners = []
 	participants = {}
 
-	def __init__(self, jid, password, room, nick):
+	def __init__(self, jid, password, room, nick, log=None):
 		sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
 		self.room = room
 		self.nick = nick
 		self.online = False
+
+		if not log is None:
+			self.log = log
+			self.log.name = __name__
+		else:
+			self.log = logging.getLogger(__name__)
 
 		self.add_event_handler("session_start", self.start)
 		self.add_event_handler("groupchat_message", self.muc_message)
@@ -89,7 +94,7 @@ class Client(sleekxmpp.ClientXMPP):
 			jid = msg['from'].full
 			if len(text) == 0:
 				return
-			log.info("[PRIVATE] %s: '%s'" % (jid, text))
+			self.log.info("[PRIVATE] %s: '%s'" % (jid, text))
 			for listener in self.private_listeners:
 				listener(msg=text, jid=jid)
 
@@ -106,7 +111,8 @@ class Client(sleekxmpp.ClientXMPP):
 					'role': role,
 					'nick': nick,
 					'affiliation': affiliation}
-			log.info("%s: %s [%s]" % (jid, role, nick))
+			self.log.info("online: %s: %s [%s]" % (fulljid, role,
+					nick))
 			if not self.online:
 				return
 			for listener in self.online_listeners:
@@ -133,13 +139,13 @@ class Client(sleekxmpp.ClientXMPP):
 				mtype='chat')
 
 	def set_role(self, nick, role):
-		log.info("setting role for %s to %s" % (nick, role))
+		self.log.info("setting role for %s to %s" % (nick, role))
 		return self.plugin['xep_0045'].setRole(self.room, nick, role)
 
 	def kick(self, nick, reason=None):
 		if not nick in self.participants:
 			return False
-		log.info("kicking %s" % nick)
+		self.log.info("kicking %s" % nick)
 		query = ET.Element("{http://jabber.org/protocol/muc#admin}query")
 		item = ET.Element("item", {"role": "none", "nick": nick})
 		if not reason is None:

@@ -9,6 +9,7 @@ import logging
 import queue
 import threading
 import traceback
+from log import Log
 
 from messaging import open_connection, ROUTING_KEY_PRESENCE, ROUTING_KEY_MUC, \
 		ROUTING_KEY_MUC_MENTION, ROUTING_KEY_SENDMUC, \
@@ -16,7 +17,27 @@ from messaging import open_connection, ROUTING_KEY_PRESENCE, ROUTING_KEY_MUC, \
 		ROUTING_KEY_COMMAND
 from client import Client
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
+
+def do_log(message, severity, module):
+	global logger
+	if len(module) > 10:
+		module = "%s..." % module[0:7]
+	msg = "[%-10s] %s" % (module, message)
+	if severity == 'DEBUG':
+		logger.debug(msg)
+	elif severity == 'INFO':
+		logger.info(msg)
+	elif severity == 'WARN':
+		logger.warn(msg)
+	elif severity == 'ERROR':
+		logger.error(msg)
+	elif severity == 'CRITICAL':
+		logger.critical(msg)
+	elif severity == 'FATAL':
+		logger.fatal(msg)
+
+log = Log(__name__, do_log)
 
 # Synchronization for pika
 class Sender(object):
@@ -91,21 +112,7 @@ if __name__ == "__main__":
 				severity = data['severity']
 				module = data['module']
 				message = data['msg']
-				if len(module) > 10:
-					module = "%s..." % module[0:7]
-				msg = "[%-10s] %s" % (module, message)
-				if severity == 'DEBUG':
-					log.debug(msg)
-				elif severity == 'INFO':
-					log.info(msg)
-				elif severity == 'WARN':
-					log.warn(msg)
-				elif severity == 'ERROR':
-					log.error(msg)
-				elif severity == 'CRITICAL':
-					log.critical(msg)
-				elif severity == 'FATAL':
-					log.fatal(msg)
+				do_log(message, severity, module)
 		except KeyError as e:
 			log.warn("missing key: %s (%s)" % (e, routing_key))
 		except Exception as e:
@@ -129,7 +136,7 @@ if __name__ == "__main__":
 	room = config.get("xmpp", "room")
 	nick = config.get("xmpp", "nick")
 
-	xmpp = Client(jid, password, room, nick)
+	xmpp = Client(jid, password, room, nick, log=log)
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping

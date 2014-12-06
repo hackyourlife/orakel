@@ -5,41 +5,19 @@ import json
 import logging
 import traceback
 import messaging
+from log import Log
 
 MUC = 0
 MUC_MENTION = 1
 PRIVMSG = 2
+CONFIG = 3
+COMMAND = 4
 
 _MAPPING = [messaging.ROUTING_KEY_MUC, messaging.ROUTING_KEY_MUC_MENTION,
-		messaging.ROUTING_KEY_PRIVMSG]
+		messaging.ROUTING_KEY_PRIVMSG, messaging.ROUTING_KEY_CONFIG,
+		messaging.ROUTING_KEY_COMMAND]
 
 log = logging.getLogger(__name__)
-
-class Log(object):
-	def __init__(self, name, send):
-		self.name = name
-		self.send = send
-
-	def log(self, severity, msg):
-		self.send(msg, severity, self.name)
-
-	def debug(self, msg):
-		self.log('DEBUG', msg)
-
-	def info(self, msg):
-		self.log('INFO', msg)
-
-	def warn(self, msg):
-		self.log('WARN', msg)
-
-	def error(self, msg):
-		self.log('ERROR', msg)
-
-	def critical(self, msg):
-		self.log('CRITICAL', msg)
-
-	def fatal(self, msg):
-		self.log('FATAL', msg)
 
 class Module(object):
 	def __init__(self, topics=[], parent=None, name=None):
@@ -111,6 +89,15 @@ class Module(object):
 				jid = data['jid']
 				msg = data['msg']
 				self.private_msg(jid=jid, msg=msg)
+			elif routing_key == messaging.ROUTING_KEY_CONFIG:
+				key = data['key']
+				value = data['value']
+				self.config_change(key, value)
+			elif routing_key == messaging.ROUTING_KEY_COMMAND:
+				cmd = data['cmd']
+				args = {key: data[key] for key in data
+						if key != 'cmd'}
+				self.command(cmd, **args)
 			else:
 				log.warn("unknown action: '%s'" % routing_key)
 
@@ -127,13 +114,13 @@ class Module(object):
 		data = {'nick': nick}
 		if reason:
 			data['reason'] = reason
-		self.command('kick', data)
+		self.send_cmd('kick', data)
 
 	def set_role(self, nick, role):
 		data = {'nick': nick, 'role': role}
-		self.command('set_role', data)
+		self.send_cmd('set_role', data)
 
-	def command(self, cmd, data):
+	def send_cmd(self, cmd, data):
 		args = {'cmd': cmd}
 		for key in data.keys():
 			args[key] = data[key]
@@ -177,4 +164,12 @@ class Module(object):
 
 	def private_msg(self, jid, msg):
 		for listener in self.listeners:
-			listener.private_msg(jid, msg)
+			listener.private_msg(jid=jid, msg=msg)
+
+	def config_change(self, key, value):
+		for listener in self.listeners:
+			listener.config_change(key=key, value=value)
+
+	def command(self, cmd, **args):
+		for listener in self.listeners:
+			listener.command(cmd, **args)
