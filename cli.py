@@ -69,7 +69,10 @@ class CLI(Module):
 						break
 
 	def statement(self, msg):
-		parts = parse(msg)
+		try:
+			parts = parse(msg)
+		except SyntaxError:
+			return
 		if len(parts) == 0:
 			return False
 		command = parts[0]
