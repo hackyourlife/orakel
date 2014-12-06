@@ -5,7 +5,8 @@ from module import Module, COMMAND
 
 class AdminCMD(Module):
 	def __init__(self, **keywords):
-		super(AdminCMD, self).__init__([COMMAND], **keywords)
+		super(AdminCMD, self).__init__([COMMAND], name=__name__,
+				**keywords)
 
 	def register(self):
 		self.send_cmd("register_cli", name=["kick"], argc=1, undo=False)

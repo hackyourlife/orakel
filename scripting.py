@@ -227,7 +227,7 @@ class Scripting(Module):
 		for key in functions.keys():
 			self.functions[key] = functions[key]
 
-		self.send_cmd("get_config", key="variables")
+		self.send_cmd("get_config", key="variables", default={})
 		self.reload_config()
 
 	def reload_config(self):

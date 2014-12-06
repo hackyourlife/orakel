@@ -12,7 +12,7 @@ class CLI(Module):
 		self.send_cmd("reregister_cli")
 		self.send_cmd("init_value", key="intrusive", value=False)
 
-	def muc_msg(self, msg, role, **keywords):
+	def muc_msg(self, msg, nick, jid, role, **keywords):
 		if msg in ["aus!", "AUS!"]:
 			self.send_cfg("intrusive", False)
 			self.send_muc(":(")
@@ -20,7 +20,7 @@ class CLI(Module):
 			self.send_cfg("intrusive", True)
 			self.send_muc(":)")
 		elif role == "moderator":
-			self.statement(msg)
+			self.statement(nick, jid, msg)
 
 	def command(self, cmd, **args):
 		if cmd == "register_cli":
@@ -68,7 +68,7 @@ class CLI(Module):
 								(c, argc))
 						break
 
-	def statement(self, msg):
+	def statement(self, caller_nick, caller_jid, msg):
 		try:
 			parts = parse(msg)
 		except SyntaxError:
@@ -104,27 +104,6 @@ class CLI(Module):
 					cmd += handler['info']
 				self.send_cmd('cli_cmd', args=args,
 						cmdline=cmdline, undo=undo,
-						command=cmd)
-
-	def parse(self, line):
-		tokens = []
-		token = []
-		instring = False
-
-		for i in range(len(line)):
-			c = line[i]
-			if instring:
-				if c == '"':
-					instring = False
-				else:
-					token += [c]
-			elif c == '"':
-				instring = True
-			elif c in ['\t', '\r', '\n', ' ']:
-				if len(token) != 0:
-					tokens += [ "".join(token) ]
-					token = []
-		if len(token) != 0:
-			tokens += [ "".join(token) ]
-
-		return tokens
+						command=cmd,
+						caller_nick=caller_nick,
+						caller_jid=caller_jid)

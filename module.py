@@ -7,13 +7,15 @@ import traceback
 import messaging
 from log import Log
 
-MUC = 0
-MUC_MENTION = 1
-PRIVMSG = 2
-CONFIG = 3
-COMMAND = 4
+PRESENCE = 0
+MUC = 1
+MUC_MENTION = 2
+PRIVMSG = 3
+CONFIG = 4
+COMMAND = 5
 
-_MAPPING = [messaging.ROUTING_KEY_MUC, messaging.ROUTING_KEY_MUC_MENTION,
+_MAPPING = [messaging.ROUTING_KEY_PRESENCE, messaging.ROUTING_KEY_MUC,
+		messaging.ROUTING_KEY_MUC_MENTION,
 		messaging.ROUTING_KEY_PRIVMSG, messaging.ROUTING_KEY_CONFIG,
 		messaging.ROUTING_KEY_COMMAND]
 
@@ -67,7 +69,21 @@ class Module(object):
 		routing_key = method.routing_key
 		data = json.loads(body.decode('utf-8'))
 		try:
-			if routing_key == messaging.ROUTING_KEY_MUC_MENTION:
+			if routing_key == messaging.ROUTING_KEY_PRESENCE:
+				action = data['type']
+				if action == "online":
+					jid = data['jid']
+					nick = data['nick']
+					role = data['role']
+					affiliation = data['affiliation']
+					self.muc_online(jid=jid, nick=nick,
+							role=role,
+							affiliation=affiliation)
+				elif action == "offline":
+					jid = data['jid']
+					nick = data['nick']
+					self.muc_offline(jid=jid, nick=nick)
+			elif routing_key == messaging.ROUTING_KEY_MUC_MENTION:
 				nick = data['nick']
 				jid = data['jid']
 				role = data['role']
@@ -167,6 +183,15 @@ class Module(object):
 		self.connection.close()
 
 	# override those functions
+	def muc_online(self, nick, jid, role, affiliation):
+		for listener in self.listeners:
+			listener.muc_online(nick=nick, jid=jid, role=role,
+					affiliation=affiliation)
+
+	def muc_offline(self, nick, jid):
+		for listener in self.listeners:
+			listener.muc_offline(nick=nick, jid=jid)
+
 	def muc_mention(self, nick, jid, role, affiliation, msg):
 		for listener in self.listeners:
 			listener.muc_mention(nick=nick, jid=jid, role=role,

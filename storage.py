@@ -26,8 +26,13 @@ class Storage(Module):
 		if cmd == 'get_config':
 			if 'key' in keywords:
 				key = keywords['key']
+				value = None
+				if "default" in keywords:
+					value = keywords["default"]
+				if key in self.values:
+					value = self.values[key]
 				self.send_cmd('config_value', key=key,
-						value=self.__getitem__(key))
+						value=value)
 			else:
 				self.publish_all()
 		elif cmd == 'init_config':
