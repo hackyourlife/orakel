@@ -1,14 +1,14 @@
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
-class Flooding(object):
-	def __init__(self, config):
-		self.config = config
-		self.maxlength = config.getint("modules", "flooding")
-		self.paste = config.get("modules", "paste")
+from module import Module, MUC
 
-	def __call__(self, msg, nick, send_message):
+class Flooding(Module):
+	def __init__(self, maxlength, paste, **keywords):
+		super(Flooding, self).__init__([MUC], name=__name__, **keywords)
+		self.maxlength = maxlength
+		self.paste = paste
+
+	def muc_msg(self, msg, **keywords):
 		if len(msg) >= self.maxlength:
-			send_message('ey! Nutz in Zukunft bitte z.B. %s !' %
+			self.send_muc("ey! Nutz in Zukunft bitte z.B. %s !" %
 					self.paste)
-			return True
-		return False

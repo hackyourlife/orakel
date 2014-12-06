@@ -32,7 +32,7 @@ class Storage(Module):
 				self.publish_all()
 
 	def config_change(self, key, value):
-		self.log.info("config change: '%s'='%s'" % (key, value))
+		self.log.debug("config change: '%s'='%s'" % (key, value))
 		self.__setitem__(key, value)
 
 	def reload_config(self):

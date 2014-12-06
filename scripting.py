@@ -12,7 +12,8 @@ import random
 import traceback
 import signal
 from contextlib import contextmanager
-from utils import oneof
+from utils import oneof, load_database
+from module import Module, MUC, CONFIG, COMMAND
 
 """
 import sys
@@ -89,8 +90,12 @@ class ReturnException(Exception):
 class TimeoutException(Exception):
 	pass
 
+def signal_handler(signum, frame):
+	raise TimeoutException()
+signal.signal(signal.SIGALRM, signal_handler)
+
 @contextmanager
-def __time_limit(seconds):
+def time_limit(seconds):
 	def signal_handler(signum, frame):
 		raise TimeoutException()
 	signal.signal(signal.SIGALRM, signal_handler)
@@ -100,19 +105,15 @@ def __time_limit(seconds):
 	finally:
 		signal.alarm(0)
 
-def signal_handler(signum, frame):
-	raise TimeoutException()
-signal.signal(signal.SIGALRM, signal_handler)
-
 @contextmanager
-def time_limit(seconds):
+def __time_limit(seconds):
 	signal.alarm(seconds)
 	try:
 		yield
 	finally:
 		signal.alarm(0)
 
-class Scripting(object):
+class Scripting(Module):
 	# supported operators
 	operators = {	ast.Add: op.add,
 			ast.Sub: op.sub,
@@ -212,13 +213,12 @@ class Scripting(object):
 			"oneof": oneof
 	}
 
-	def __init__(self, storage=None, search_engines={}):
-		self.storage = storage
-		self.search_engines = search_engines
-		try:
-			self.variables = storage["variables"]
-		except:
-			self.variables = {}
+	def __init__(self, search_engine_file=None, **keywords):
+		super(Scripting, self).__init__([MUC, CONFIG, COMMAND],
+				name=__name__, **keywords)
+
+		self.search_engine_file = search_engine_file
+		self.variables = {}
 
 		functions = {
 			"search": self.search,
@@ -227,18 +227,29 @@ class Scripting(object):
 		for key in functions.keys():
 			self.functions[key] = functions[key]
 
+		self.send_cmd("get_config", key="variables")
+		self.reload_config()
+
+	def reload_config(self):
+		self.search_engines = load_database(self.search_engine_file)
+
+	def command(self, cmd, **keywords):
+		if cmd == "config_value":
+			if keywords["key"] == "variables":
+				self.variables = keywords["value"]
+		elif cmd == "config_values":
+			self.variables = keywords["value"]["variables"]
+
 	def evaluate(self, expr):
 		x = ast.parse(expr)
 		try:
 			result = [ self._eval(z) for z in x.body ]
 		except ReturnException as e:
-			if not self.storage is None:
-				self.storage["variables"] = self.variables
+			self.send_cfg("variables", self.variables)
 			return e.value
 		except:
 			raise
-		if not self.storage is None:
-			self.storage["variables"] = self.variables
+		self.send_cfg("variables", self.variables)
 		return result[-1]
 
 	def _eval(self, node):
@@ -254,6 +265,8 @@ class Scripting(object):
 			raise NotImplemented
 		elif isinstance(node, ast.List):
 			return [ self._eval(x) for x in node.elts ]
+		elif isinstance(node, ast.Tuple):
+			return tuple([ self._eval(x) for x in node.elts ])
 		elif isinstance(node, ast.Subscript):
 			if isinstance(node.value, ast.Name):
 				target = self.variables[node.value.id]
@@ -329,10 +342,47 @@ class Scripting(object):
 				or isinstance(node, list) \
 				or isinstance(node, dict):
 			return node
+		elif isinstance(node, ast.Compare):
+			print(vars(node))
+			left = self._eval(node.left)
+			value = True
+			for i in range(len(node.ops)):
+				right = self._eval(node.comparators[i])
+				value = value and (self.compare(left,
+					node.ops[i], right))
+				left = right
+			return value
 		else:
 			raise TypeError(node)
 
-	def __call__(self, msg, nick, send_message):
+	def compare(self, left, op, right):
+		if isinstance(op, ast.Eq):
+			return left == right
+		elif isinstance(op, ast.NotEq):
+			return left != right
+		elif isinstance(op, ast.Lt):
+			return left < right
+		elif isinstance(op, ast.LtE):
+			return left <= right
+		elif isinstance(op, ast.Gt):
+			return left > right
+		elif isinstance(op, ast.GtE):
+			return left >= right
+		elif isinstance(op, ast.Is):
+			return left is right
+		elif isinstance(op, ast.IsNot):
+			return not left is right
+		elif isinstance(op, ast.In):
+			return left in right
+		elif isinstance(op, ast.NotIn):
+			return not left in right
+		raise TypeError(op)
+
+	def muc_msg(self, msg, nick, jid, role, affiliation, **keywords):
+		self.constants['__nick__'] = nick
+		self.constants['__jid__'] = jid
+		self.constants['__role__'] = role
+		self.constants['__affiliation__'] = affiliation
 		def allowed(c):
 			if c in ["\r", "\n", "\t"]:
 				return True
@@ -340,37 +390,34 @@ class Scripting(object):
 				return False
 			return True
 		if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
-			return False
+			return
 		if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
-			return False
+			return
 		try:
 			if msg in self.variables:
-				return False
+				return
 			with time_limit(10):
 				result = self.evaluate(msg)
-			if result:
-				if ("'%s'" % result) == msg or \
-						('"%s"' % result) == msg or \
-						("'%s'" % result) == \
+			if not result is None:
+				if ("'%s'" % str(result)) == msg or \
+						('"%s"' % str(result)) == \
+							msg or \
+						("'%s'" % str(result)) == \
 							msg.strip() or \
-						('"%s"' % result) == \
+						('"%s"' % str(result)) == \
 							msg.strip():
-					return False
+					return
 				result = [ c for c in str(result)
 						if allowed(c) ]
 				if len(result) > 750:
-					result = result[:750] + "…"
-				send_message("".join(result))
-				return True
+					result = result[:750] + ["…"]
+				self.send_muc("".join(result))
 		except SyntaxError:
 			pass
 		except dns.resolver.NXDOMAIN:
-			send_message('Exception: NXDOMAIN')
-			return True
+			self.send_muc('Exception: NXDOMAIN')
 		except dns.exception.Timeout:
-			send_message('Exception: timeout')
-			return True
+			self.send_muc('Exception: timeout')
 		except:
-			print("%s: '%s'" % (nick, msg))
-			traceback.print_exc()
-		return False
+			#traceback.print_exc()
+			pass

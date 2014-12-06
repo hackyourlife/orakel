@@ -181,7 +181,7 @@ if __name__ == "__main__":
 		channel.start_consuming()
 	except KeyboardInterrupt: pass
 
-	sender.stop()
+	#sender.stop()
 	xmpp.disconnect()
 	connection.close()
-	send_connection.close()
+	#send_connection.close()

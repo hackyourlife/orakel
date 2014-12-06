@@ -127,6 +127,7 @@ class Client(sleekxmpp.ClientXMPP):
 			nick = self.participants[jid]['nick']
 			fulljid = self.participants[jid]['jid']
 			del self.participants[jid]
+			self.log.info("offline: %s: %s" % (fulljid, nick))
 			for listener in self.offline_listeners:
 				listener(jid=fulljid, nick=nick)
 

@@ -9,14 +9,17 @@ from storage import Storage
 from msgdatabase import MessageDatabase
 from search import Search
 from pingpong import PingPong
+from flooding import Flooding
 
 class Core(Module):
-	def __init__(self, questions, search_engines, storage):
+	def __init__(self, questions, search_engines, storage, maxlength,
+			paste):
 		super(Core, self).__init__(name="core")
 		self.storage = Storage(storage, parent=self)
 		self.messages = MessageDatabase(questions, parent=self)
 		self.search = Search(search_engines, parent=self)
 		self.pingpong = PingPong(parent=self)
+		self.flooding = Flooding(maxlength, paste, parent=self)
 		self.log.info("load complete")
 
 if __name__ == "__main__":
@@ -29,7 +32,9 @@ if __name__ == "__main__":
 	questions = config.get("db", "questions")
 	search_engines = config.get("db", "searchengines")
 	storage = config.get("db", "storage")
-	core = Core(questions, search_engines, storage)
+	maxlength = config.getint("modules", "flooding")
+	paste = config.get("modules", "paste")
+	core = Core(questions, search_engines, storage, maxlength, paste)
 	try:
 		core.start()
 	except KeyboardInterrupt:

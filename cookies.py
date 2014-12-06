@@ -3,19 +3,17 @@
 import re
 import datetime
 from utils import oneof
+from module import Module, MUC
 
-class Cookies(object):
-	def __call__(self, msg, nick, send_message):
+class Cookies(Module):
+	def __init__(self, **keywords):
+		super(Cookies, self).__init__([MUC], name=__name__, **keywords)
+
+	def muc_msg(self, msg, nick, **keywords):
 		if "keks" in msg.lower():
 			result = self.handle(msg, nick)
-		else:
-			return False
-
-		if result:
-			send_message(result)
-			return True
-
-		return False
+			if result:
+				self.send_muc(result)
 
 	def handle(self, msg, nick):
 		users = ["Socke", "Malte", "Fatfox", "Schneck", "thomasba", "T",
@@ -51,7 +49,8 @@ class Cookies(object):
 			elif match.group(2) in ["sonok", "snook", "Socke"]:
 				cookies = ["Nudel", "Ketchup", "Nudel-Ketchup"]
 			elif match.group(2) in ["c143", "tse143", "tse", "c143po"]:
-				cookies = ["Bier", "Pizza", "Kartoffel", "Tofu", "Salat", "Imaginären"]
+				cookies = ["Bier", "Pizza", "Kartoffel", "Tofu",
+						"Salat", "Imaginären"]
 			if not match.group(1) is None:
 				cookie = match.group(1)[:-1].split('-')
 				cookie = [x[0].upper() + x[1:].lower() \
