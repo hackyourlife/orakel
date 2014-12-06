@@ -20,11 +20,13 @@ from config import Configuration
 from choice import Choice
 from scripting import Scripting
 from fatfox import FatFox
+from burgi import Burgi
 from cookies import Cookies
 from mute import Mute
 from status import Status
 from url_title import Urltitle
 from finder import Finder
+from hands import Hands
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -74,10 +76,11 @@ if __name__ == "__main__":
 	choice = Choice(conf)
 	scripting = Scripting(storage, search_engines=search_engines)
 	fatfox = FatFox()
+	burgi = Burgi()
 	cookies = Cookies()
 	#urltitle = Urltitle()
 	#finder = Finder()
-
+	hands = Hands(storage, conf, config.get("modules", "hands"))
 	mute = Mute(storage)
 
 	conf.add_handler('mute', mute.config_handler)
@@ -103,6 +106,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(flooding)
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
+	xmpp.add_message_listener(burgi)
 	xmpp.add_message_listener(cookies)
 	#xmpp.add_message_listener(urltitle)
 	xmpp.add_message_listener(actions.passive)
@@ -110,6 +114,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(scripting)
 	xmpp.add_online_listener(mute.on_online)
 	#xmpp.add_message_listener(finder)
+	xmpp.add_message_listener(hands)
 
 	def get_participants():
 		return xmpp.participants
