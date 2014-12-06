@@ -144,9 +144,12 @@ class Client(sleekxmpp.ClientXMPP):
 		return self.plugin['xep_0045'].setRole(self.room, nick, role)
 
 	def kick(self, nick, reason=None):
-		if not nick in self.participants:
+		if not self.is_participant(nick):
+			self.log.warn("trying to kick non-existent user '%s'" %
+					nick)
 			return False
-		self.log.info("kicking %s" % nick)
+		pr = "no reason" if reason is None else "reason: %s" % reason
+		self.log.info("kicking %s (%s)" % (nick, pr))
 		query = ET.Element("{http://jabber.org/protocol/muc#admin}query")
 		item = ET.Element("item", {"role": "none", "nick": nick})
 		if not reason is None:
@@ -160,3 +163,13 @@ class Client(sleekxmpp.ClientXMPP):
 		if result is False or result['type'] != 'result':
 			raise ValueError
 		return True
+
+	def is_participant(self, nick):
+		return not self.get_participant(nick) is None
+
+	def get_participant(self, nick):
+		for jid in self.participants:
+			participant = self.participants[jid]
+			if participant["nick"] == nick:
+				return participant
+		return None
