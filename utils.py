@@ -15,3 +15,14 @@ def startswith(a, b):
 		if a[i] != b[i]:
 			return False
 	return True
+
+def load_database(filename):
+	database = {}
+	with open(filename, "r") as f:
+		for line in f.readlines():
+			line = line.strip()
+			parts = line.split(";")
+			key = parts[0].strip().lower()
+			value = ";".join(parts[1:]).strip()
+			database[key] = value
+	return database
