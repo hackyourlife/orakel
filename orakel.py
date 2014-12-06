@@ -106,7 +106,7 @@ if __name__ == "__main__":
 	xmpp.add_message_listener(flooding)
 	#xmpp.add_message_listener(expression)
 	xmpp.add_message_listener(fatfox)
-	xmpp.add_message_listener(burgi)
+	#xmpp.add_message_listener(burgi)
 	xmpp.add_message_listener(cookies)
 	#xmpp.add_message_listener(urltitle)
 	xmpp.add_message_listener(actions.passive)
