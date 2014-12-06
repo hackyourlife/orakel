@@ -75,15 +75,20 @@ if __name__ == "__main__":
 	channel = connection.channel()
 	channel.exchange_declare(exchange=exchange, type="direct")
 
-	# ugly workaround because pika does not like multiple threads
-	send_connection, exchange = open_connection()
-	send_channel = send_connection.channel()
-	sender = Sender(send_channel, exchange)
-	sender.start()
+	## ugly workaround because pika does not like multiple threads
+	#send_connection, exchange = open_connection()
+	#send_channel = send_connection.channel()
+	#sender = Sender(send_channel, exchange)
+	#sender.start()
+	#sender = Sender(send_channel, exchange)
+
+	#def send(key, data):
+	#	sender.send(routing_key=key,
+	#		body=json.dumps(data).encode('utf-8'))
 
 	def send(key, data):
-		sender.send(routing_key=key,
-			body=json.dumps(data).encode('utf-8'))
+		channel.basic_publish(exchange=exchange, routing_key=key,
+				body=json.dumps(data).encode('utf-8'))
 
 	def receive(ch, method, properties, body):
 		routing_key = method.routing_key
@@ -106,8 +111,8 @@ if __name__ == "__main__":
 					nick = data['nick']
 					role = data['role']
 					xmpp.set_role(nick, role)
-				else:
-					log.warn("unknown command '%s'" % cmd)
+				#else:
+				#	log.warn("unknown command '%s'" % cmd)
 			elif routing_key == ROUTING_KEY_LOG:
 				severity = data['severity']
 				module = data['module']

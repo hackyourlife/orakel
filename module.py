@@ -97,7 +97,10 @@ class Module(object):
 				cmd = data['cmd']
 				args = {key: data[key] for key in data
 						if key != 'cmd'}
-				self.command(cmd, **args)
+				if cmd == 'reload_config':
+					self.reload_config()
+				else:
+					self.command(cmd, **args)
 			else:
 				log.warn("unknown action: '%s'" % routing_key)
 
@@ -114,13 +117,13 @@ class Module(object):
 		data = {'nick': nick}
 		if reason:
 			data['reason'] = reason
-		self.send_cmd('kick', data)
+		self.send_cmd('kick', **data)
 
 	def set_role(self, nick, role):
 		data = {'nick': nick, 'role': role}
-		self.send_cmd('set_role', data)
+		self.send_cmd('set_role', **data)
 
-	def send_cmd(self, cmd, data):
+	def send_cmd(self, cmd, **data):
 		args = {'cmd': cmd}
 		for key in data.keys():
 			args[key] = data[key]
@@ -129,6 +132,10 @@ class Module(object):
 	def send_private(self, jid, msg):
 		self.send(messaging.ROUTING_KEY_SENDPRIVMSG,
 				{'to': jid, 'msg': msg})
+
+	def send_cfg(self, key, value):
+		self.send(messaging.ROUTING_KEY_CONFIG,
+				{'key': key, 'value': value})
 
 	def do_log(self, msg, severity='INFO', module=None):
 		if module is None:
@@ -173,3 +180,7 @@ class Module(object):
 	def command(self, cmd, **args):
 		for listener in self.listeners:
 			listener.command(cmd, **args)
+
+	def reload_config(self):
+		for listener in self.listeners:
+			listener.reload_config()

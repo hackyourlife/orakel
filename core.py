@@ -5,13 +5,15 @@
 import configparser
 import logging
 from module import Module
+from storage import Storage
 from msgdatabase import MessageDatabase
 from search import Search
 from pingpong import PingPong
 
 class Core(Module):
-	def __init__(self, questions, search_engines):
+	def __init__(self, questions, search_engines, storage):
 		super(Core, self).__init__(name="core")
+		self.storage = Storage(storage, parent=self)
 		self.messages = MessageDatabase(questions, parent=self)
 		self.search = Search(search_engines, parent=self)
 		self.pingpong = PingPong(parent=self)
@@ -26,7 +28,8 @@ if __name__ == "__main__":
 	config.read(filename)
 	questions = config.get("db", "questions")
 	search_engines = config.get("db", "searchengines")
-	core = Core(questions, search_engines)
+	storage = config.get("db", "storage")
+	core = Core(questions, search_engines, storage)
 	try:
 		core.start()
 	except KeyboardInterrupt:

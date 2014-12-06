@@ -35,8 +35,14 @@ def open_connection(on_open=None):
 	port = None
 	username = None
 	password = None
+	heartbeat = 30
 	try:
 		port = config.getint("messaging", "port")
+	except configparser.NoOptionError: pass
+	except TypeError: pass
+	except KeyError: pass
+	try:
+		heartbeat = config.getint("messaging", "heartbeat")
 	except configparser.NoOptionError: pass
 	except TypeError: pass
 	except KeyError: pass
@@ -54,7 +60,11 @@ def open_connection(on_open=None):
 	parts += ["/"]
 	if not virtual_host is None:
 		parts += [virtual_host]
+	querystring = ["heartbeat_interval=%d" % heartbeat]
+	qs = "&".join(querystring)
 	url = "".join(parts)
+	if len(qs) > 0:
+		url += "?" + qs
 
 	connection = None
 	if on_open:
