@@ -136,7 +136,8 @@ class Scripting(Module):
 	unaryoperators = {
 			ast.USub: op.neg,
 			ast.UAdd: op.pos,
-			ast.Invert: op.invert }
+			ast.Invert: op.invert,
+			ast.Not: op.not_ }
 
 	attrfunctions = {
 			ast.Str: {
@@ -175,6 +176,19 @@ class Scripting(Module):
 
 	def do_eval(self, expression):
 		return self.evaluate(expression)
+
+	def do_print(self, *args):
+		def allowed(c):
+			if c in ["\r", "\n", "\t"]:
+				return True
+			if ord(c) < 32:
+				return False
+			return True
+		result = " ".join([ str(x) for x in args ])
+		result = [ c for c in result if allowed(c) ]
+		if len(result) > 750:
+			result = result[:750] + ["…"]
+		self.send_muc("".join(result))
 
 	functions  = {	"sin": math.sin,
 			"cos": math.cos,
@@ -234,6 +248,7 @@ class Scripting(Module):
 		functions = {
 			"search": self.search,
 			"vars": self._vars,
+			"print": self.do_print,
 			"eval": self.do_eval }
 		for key in functions.keys():
 			self.functions[key] = functions[key]
@@ -280,46 +295,56 @@ class Scripting(Module):
 		self.send_cfg("variables", self.variables)
 		return result[-1]
 
-	def _eval(self, node):
+	def _eval(self, node, var={}):
 		if isinstance(node, ast.Num):
 			return node.n
 		elif isinstance(node, ast.Str):
 			return node.s
 		elif isinstance(node, ast.Expr):
-			return self._eval(node.value)
+			return self._eval(node.value, var)
 		elif isinstance(node, ast.Return):
-			raise ReturnException(self._eval(node.value))
+			raise ReturnException(self._eval(node.value, var))
 		elif isinstance(node, ast.Attribute):
-			value = self._eval(node.value)
+			value = self._eval(node.value, var)
 			return value.__getattr__(node.attr)
 		elif isinstance(node, ast.List):
-			return [ self._eval(x) for x in node.elts ]
+			return [ self._eval(x, var) for x in node.elts ]
 		elif isinstance(node, ast.Tuple):
-			return tuple([ self._eval(x) for x in node.elts ])
+			return tuple([ self._eval(x, var) for x in node.elts ])
 		elif isinstance(node, ast.Subscript):
-			target = self._eval(node.value)
+			target = self._eval(node.value, var)
 			if isinstance(node.slice, ast.Index):
 				value = self._eval(node.slice.value)
 				return target[value]
 			else:
-				lower = self._eval(node.slice.lower)
-				upper = self._eval(node.slice.upper)
-				step = self._eval(node.slice.step)
+				lower = self._eval(node.slice.lower, var)
+				upper = self._eval(node.slice.upper, var)
+				step = self._eval(node.slice.step, var)
 				return target[lower:upper:step]
 		elif isinstance(node, ast.ListComp):
 			generator = node.generators[0]
 			target = generator.target.id
-			items = self._eval(generator.iter)
+			items = self._eval(generator.iter, var)
 			if len(items) > 100:
 				raise Exception('too many iterations')
+			var_ = { x : var[x] for x in var }
 			def step(x, y, z):
-				self.variables[y] = z
-				result = self._eval(x)
-				del self.variables[y]
+				var_[y] = z
+				result = self._eval(x, var_)
 				return result
-			return [ step(node.elt, target, x) for x in items ]
+			if len(generator.ifs) == 0:
+				return [ step(node.elt, target, x) \
+						for x in items ]
+			def ifs(x):
+				var_[target] = x
+				v = True
+				for i in generator.ifs:
+					v = v and self._eval(i, var_)
+				return v
+			return [ step(node.elt, target, x) for x in items \
+					if ifs(x) ]
 		elif isinstance(node, ast.Call):
-			args = [ self._eval(x) for x in node.args ]
+			args = [ self._eval(x, var) for x in node.args ]
 			if isinstance(node.func, ast.Attribute):
 				obj = node.func.value
 				func = node.func.attr
@@ -327,12 +352,15 @@ class Scripting(Module):
 					function = self.attrfunctions[type(obj)][func]
 				else:
 					raise NotImplemented
-				args = [ self._eval(node.func.value) ] + args
+				args = [ self._eval(node.func.value, var) ] \
+						+ args
 			else:
 				function = self.functions[node.func.id]
 			return function(*args)
 		elif isinstance(node, ast.Name):
-			if node.id in self.constants:
+			if node.id in var:
+				return var[node.id]
+			elif node.id in self.constants:
 				return self.constants[node.id]
 			else:
 				return self.variables[node.id]
@@ -341,18 +369,19 @@ class Scripting(Module):
 		elif isinstance(node, ast.unaryop):
 			return self.unaryoperators[type(node)]
 		elif isinstance(node, ast.UnaryOp):
-			return self._eval(node.op)(self._eval(node.operand))
+			return self._eval(node.op, var)(self._eval(node.operand,
+				var))
 		elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-			operator = self._eval(node.op)
+			operator = self._eval(node.op, var)
 			if operator is op.pow:
-				right = self._eval(node.right)
+				right = self._eval(node.right, var)
 				if right > 200:
 					raise Exception('pow')
-			return self._eval(node.op)(self._eval(node.left),
-					self._eval(node.right))
+			return self._eval(node.op, var)(self._eval(node.left,
+					var), self._eval(node.right, var))
 		elif isinstance(node, ast.Assign):
 			target = node.targets[0].id
-			value = self._eval(node.value)
+			value = self._eval(node.value, var)
 			if target in self.constants:
 				raise SyntaxError('cannot assign to constant')
 			self.variables[target] = value
@@ -369,15 +398,45 @@ class Scripting(Module):
 				or isinstance(node, dict):
 			return node
 		elif isinstance(node, ast.Compare):
-			print(vars(node))
-			left = self._eval(node.left)
+			left = self._eval(node.left, var)
 			value = True
 			for i in range(len(node.ops)):
-				right = self._eval(node.comparators[i])
+				right = self._eval(node.comparators[i], var)
 				value = value and (self.compare(left,
 					node.ops[i], right))
 				left = right
 			return value
+		elif isinstance(node, ast.BoolOp):
+			if isinstance(node.op, ast.And):
+				value = self._eval(node.values[0], var)
+				if value == False:
+					return False
+				for i in range(1, len(node.values)):
+					v = self._eval(node.values[i], var)
+					value = value and v
+					if value == False:
+						return False
+				return value
+			elif isinstance(node.op, ast.Or):
+				value = self._eval(node.values[0], var)
+				if value == True:
+					return True
+				for i in range(1, len(node.values)):
+					v = self._eval(node.values[i], var)
+					value = value or v
+					if value == True:
+						return True
+				return value
+			else:
+				raise NotImplemented
+		elif isinstance(node, ast.NameConstant):
+			return node.value
+		elif isinstance(node, ast.IfExp):
+			test = self._eval(node.test, var)
+			if test:
+				return self._eval(node.body, var)
+			else:
+				return self._eval(node.orelse, var)
 		else:
 			raise TypeError(node)
 
@@ -426,12 +485,6 @@ class Scripting(Module):
 		self.constants['__affiliation__'] = affiliation
 		self.constants['__participants__'] = participants
 		self.constants['__room_jid__'] = self.room_jid
-		def allowed(c):
-			if c in ["\r", "\n", "\t"]:
-				return True
-			if ord(c) < 32:
-				return False
-			return True
 		if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
 			return
 		if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
@@ -450,11 +503,7 @@ class Scripting(Module):
 						('"%s"' % str(result)) == \
 							msg.strip():
 					return
-				result = [ c for c in str(result)
-						if allowed(c) ]
-				if len(result) > 750:
-					result = result[:750] + ["…"]
-				self.send_muc("".join(result))
+				self.do_print(result)
 		except SyntaxError:
 			pass
 		except dns.resolver.NXDOMAIN:
