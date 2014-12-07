@@ -97,8 +97,14 @@ class AutoCMD(Module):
 
 	def show_autokick(self, nicks):
 		if nicks:
-			self.send_muc("autokick nicks: %s" % \
-					", ".join(self.nicks))
+			if len(self.nicks) == 0:
+				self.send_muc("no autokick nicks configured")
+			else:
+				self.send_muc("autokick nicks: %s" % \
+						", ".join(self.nicks))
 		else:
-			self.send_muc("autokick jids: %s" % \
-					", ".join(self.jids))
+			if len(self.jids) == 0:
+				self.send_muc("no autokick jids configured")
+			else:
+				self.send_muc("autokick jids: %s" % \
+						", ".join(self.jids))
