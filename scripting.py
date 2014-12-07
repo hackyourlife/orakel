@@ -217,6 +217,7 @@ class Scripting(Module):
 			"oct": oct,
 			"ord": ord,
 			"range": range,
+			"set": set,
 			"str": str,
 			"sum": sum,
 			"tuple": tuple,

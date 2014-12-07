@@ -8,6 +8,7 @@ from module import Module
 from admincmd import AdminCMD
 from autocmd import AutoCMD
 from mute import Mute
+from terminator import Terminator
 
 class Admin(Module):
 	def __init__(self, trollmsg):
@@ -15,6 +16,7 @@ class Admin(Module):
 		self.admincmd = AdminCMD(parent=self)
 		self.autocmd = AutoCMD(trollmsg, parent=self)
 		self.mute = Mute(parent=self)
+		self.terminator = Terminator(parent=self)
 		self.log.info("load complete")
 
 if __name__ == "__main__":
