@@ -135,8 +135,11 @@ class Client(sleekxmpp.ClientXMPP):
 		sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
 				mbody=msg, mtype='groupchat')
 
-	def msg_send(self, to, msg):
-		sleekxmpp.ClientXMPP.send_message(self, mto=to, mbody=msg,
+	def msg_send(self, to, msg, muc):
+		jid = to
+		if muc:
+			jid = "%s/%s" % (self.room, to)
+		sleekxmpp.ClientXMPP.send_message(self, mto=jid, mbody=msg,
 				mtype='chat')
 
 	def set_role(self, nick, role):

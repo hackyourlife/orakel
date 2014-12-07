@@ -98,7 +98,10 @@ if __name__ == "__main__":
 			if routing_key == ROUTING_KEY_SENDMUC:
 				xmpp.muc_send(data)
 			elif routing_key == ROUTING_KEY_SENDPRIVMSG:
-				xmpp.msg_send(data['to'], data['msg'])
+				muc = False
+				if 'muc' in data:
+					muc = data['muc']
+				xmpp.msg_send(data['to'], data['msg'], muc)
 			elif routing_key == ROUTING_KEY_COMMAND:
 				cmd = data['cmd']
 				if cmd == 'kick':

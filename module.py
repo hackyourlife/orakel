@@ -148,9 +148,9 @@ class Module(object):
 			args[key] = data[key]
 		self.send(messaging.ROUTING_KEY_COMMAND, args)
 
-	def send_private(self, jid, msg):
+	def send_private(self, jid, msg, muc=False):
 		self.send(messaging.ROUTING_KEY_SENDPRIVMSG,
-				{'to': jid, 'msg': msg})
+				{'to': jid, 'msg': msg, 'muc': muc})
 
 	def send_cfg(self, key, value):
 		self.send(messaging.ROUTING_KEY_CONFIG,
