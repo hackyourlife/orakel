@@ -4,6 +4,8 @@
 import sys
 import configparser
 import pika
+import threading
+import queue
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -74,3 +76,31 @@ def open_connection(on_open=None):
 		connection = pika.BlockingConnection(pika.URLParameters(url))
 
 	return connection, exchange
+
+# Synchronization for pika
+class Sender(object):
+	def __init__(self, channel, exchange):
+		self.channel = channel
+		self.exchange = exchange
+		self.queue = queue.Queue()
+		self.running = True
+
+	def send(self, body, routing_key):
+		self.queue.put({'body': body, 'routing_key': routing_key})
+
+	def stop(self):
+		self.running = False
+		self.queue.join()
+
+	def start(self):
+		def worker():
+			while self.running or not self.queue.empty():
+				msg = self.queue.get()
+				self.channel.basic_publish(
+						exchange=self.exchange,
+						routing_key=msg['routing_key'],
+						body=msg['body'])
+				self.queue.task_done()
+		t = threading.Thread(target=worker)
+		t.daemon = True
+		t.start()

@@ -6,12 +6,14 @@ import configparser
 import logging
 from module import Module
 from admincmd import AdminCMD
+from autocmd import AutoCMD
 from mute import Mute
 
 class Admin(Module):
 	def __init__(self):
 		super(Admin, self).__init__(name="admin")
 		self.admincmd = AdminCMD(parent=self)
+		self.autocmd = AutoCMD(parent=self)
 		self.mute = Mute(parent=self)
 		self.log.info("load complete")
 

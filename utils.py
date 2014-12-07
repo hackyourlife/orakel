@@ -53,3 +53,21 @@ def parse(line):
 		tokens += [ "".join(token) ]
 
 	return tokens
+
+def split_jid(jid):
+	try:
+		p1 = jid.index('@')
+	except ValueError:
+		raise SyntaxError('not a valid jid')
+	p2 = None
+	try:
+		p2 = jid.index('/', p1)
+	except ValueError: pass
+	user = jid[0:p1]
+	host = jid[p1 + 1:p2]
+	resource = None if not p2 else jid[p2 + 1:]
+	return [user, host, resource]
+
+def strip_jid(jid):
+	tokens = split_jid(jid)
+	return "%s@%s" % (tokens[0], tokens[1])

@@ -36,14 +36,17 @@ class CLI(Module):
 			if not command in self.handlers:
 				self.handlers[command] = []
 			handler = [{'argc': argc, 'info': info, 'undo' : undo}]
+			c = [command]
+			if len(info) > 0:
+				c += info
+			c = " ".join(c)
 			if not handler in self.handlers[command]:
 				self.handlers[command] += handler
-				c = [command]
-				if len(info) > 0:
-					c += info
-				c = " ".join(c)
 				self.log.info("command registered: \"%s\" " \
 						"(%d args)" % (c, argc))
+			else:
+				self.log.warn("command already registered: " \
+						"\"%s\" (%d args)" % (c, argc))
 		elif cmd == "unregister_cli":
 			command = args["name"]
 			argc = args["argc"]

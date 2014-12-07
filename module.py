@@ -6,6 +6,7 @@ import logging
 import traceback
 import messaging
 from log import Log
+from messaging import Sender
 
 PRESENCE = 0
 MUC = 1
@@ -36,6 +37,8 @@ class Module(object):
 		self.channel = self.connection.channel()
 		self.channel.exchange_declare(exchange=self.exchange,
 				type="direct")
+
+		self.sender = Sender(self.channel, self.exchange)
 
 		if len(topics) == 0:
 			return
@@ -164,15 +167,15 @@ class Module(object):
 		if self.parent:
 			self.parent.send(key, data)
 			return
-		self.channel.basic_publish(exchange=self.exchange,
-				routing_key=key,
-				body=json.dumps(data).encode('utf-8'))
+		self.sender.send(body=json.dumps(data).encode('utf-8'),
+				routing_key=key)
 
 	def start(self):
 		for listener in self.listeners:
 			listener.start()
 		if self.parent:
 			return
+		self.sender.start()
 		self.channel.start_consuming()
 
 	def stop(self):
@@ -180,6 +183,7 @@ class Module(object):
 			listener.stop()
 		if self.parent:
 			return
+		self.sender.stop()
 		self.connection.close()
 
 	# override those functions
