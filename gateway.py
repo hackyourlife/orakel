@@ -114,6 +114,8 @@ if __name__ == "__main__":
 					nick = data['nick']
 					role = data['role']
 					xmpp.set_role(nick, role)
+				elif cmd == 'get_room_info':
+					send_room_config()
 				#else:
 				#	log.warn("unknown command '%s'" % cmd)
 			elif routing_key == ROUTING_KEY_LOG:
@@ -126,6 +128,12 @@ if __name__ == "__main__":
 		except Exception as e:
 			log.error("caught exception: %s" % e)
 			traceback.print_exc()
+
+	def send_room_config():
+		participants = xmpp.get_participants()
+		data = {'cmd': 'room_info', 'participants': participants,
+				'jid': xmpp.room}
+		send(key=ROUTING_KEY_COMMAND, data=data)
 
 	result = channel.queue_declare(exclusive=True)
 	queue_name = result.method.queue
@@ -160,9 +168,10 @@ if __name__ == "__main__":
 	def priv_msg(msg, jid):
 		send(ROUTING_KEY_PRIVMSG, {'jid': jid, 'msg': msg})
 
-	def muc_online(jid, nick, role, affiliation):
+	def muc_online(jid, nick, role, affiliation, localjid):
 		send(ROUTING_KEY_PRESENCE, {'type': 'online', 'jid': jid,
-			'nick': nick, 'role': role, 'affiliation': affiliation})
+			'nick': nick, 'role': role, 'affiliation': affiliation,
+			'localjid': localjid})
 
 	def muc_offline(jid, nick):
 		send(ROUTING_KEY_PRESENCE, {'type': 'offline', 'jid': jid,
@@ -173,6 +182,7 @@ if __name__ == "__main__":
 	xmpp.add_online_listener(muc_online)
 	xmpp.add_offline_listener(muc_offline)
 	xmpp.add_private_listener(priv_msg)
+	xmpp.add_init_complete_listener(send_room_config)
 
 	if xmpp.connect():
 		xmpp.process(block=False)

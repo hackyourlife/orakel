@@ -46,6 +46,7 @@ flooding = 750
 paste = https://paste42.de/
 noalphabet = k,T
 op = mod-nick
+troll = Du wurdest gemuted.
 
 [timeouts]
 hands = 10
@@ -54,6 +55,7 @@ alphabet = 10
 count = 10
 ```
 
+- `troll`: Durch `;` getrennte Liste von Troll-Nachrichten
 - `hands`: Reagieren auf `\o/`, `o-` & Co.
 - `*grace`: Diese Zeit (in Sekunden) muss vergehen, bevor auf ein Event wieder
   reagiert wird.

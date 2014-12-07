@@ -118,6 +118,8 @@ class Module(object):
 						if key != 'cmd'}
 				if cmd == 'reload_config':
 					self.reload_config()
+				elif cmd == 'reconfigure_room':
+					self.muc_reconfigure()
 				else:
 					self.command(cmd, **args)
 			else:
@@ -221,3 +223,7 @@ class Module(object):
 	def reload_config(self):
 		for listener in self.listeners:
 			listener.reload_config()
+
+	def muc_reconfigure(self):
+		for listener in self.listeners:
+			listener.muc_reconfigure()

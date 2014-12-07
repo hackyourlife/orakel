@@ -3,6 +3,7 @@
 
 import sleekxmpp
 from sleekxmpp.xmlstream import ET
+from time import time
 import logging
 
 
@@ -12,6 +13,7 @@ class Client(sleekxmpp.ClientXMPP):
 	message_listeners = []
 	online_listeners = []
 	offline_listeners = []
+	init_complete_listeners = []
 	participants = {}
 
 	def __init__(self, jid, password, room, nick, log=None):
@@ -49,6 +51,9 @@ class Client(sleekxmpp.ClientXMPP):
 
 	def add_private_listener(self, listener):
 		self.private_listeners += [ listener ]
+
+	def add_init_complete_listener(self, listener):
+		self.init_complete_listeners += [ listener ]
 
 	def start(self, event):
 		self.get_roster()
@@ -110,15 +115,19 @@ class Client(sleekxmpp.ClientXMPP):
 			self.participants[jid] = {'jid': fulljid,
 					'role': role,
 					'nick': nick,
-					'affiliation': affiliation}
+					'affiliation': affiliation,
+					'time': time()}
 			self.log.info("online: %s: %s [%s]" % (fulljid, role,
 					nick))
 			if not self.online:
 				return
 			for listener in self.online_listeners:
 				listener(jid=fulljid, nick=nick, role=role,
-						affiliation=affiliation)
+						affiliation=affiliation,
+						localjid=jid)
 		else:
+			for listener in self.init_complete_listeners:
+				listener()
 			self.online = True
 
 	def muc_offline(self, presence):
@@ -180,3 +189,6 @@ class Client(sleekxmpp.ClientXMPP):
 			if participant["nick"] == nick:
 				return participant
 		return None
+
+	def get_participants(self):
+		return self.participants

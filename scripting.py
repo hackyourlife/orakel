@@ -13,7 +13,7 @@ import traceback
 import signal
 from contextlib import contextmanager
 from utils import oneof, load_database
-from module import Module, MUC, CONFIG, COMMAND
+from module import Module, PRESENCE, MUC, CONFIG, COMMAND
 
 """
 import sys
@@ -24,6 +24,7 @@ for attr in (a for a in dir(module) if not a.startswith('_')):
 """
 
 import datetime
+from time import time as unixtime
 import uuid as guid
 
 _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -38,6 +39,9 @@ def isotime(at=None):
 	"""Stringify time in ISO 8601 format."""
 	if not at:
 		at = utcnow()
+	if type(at) == float:
+		at = datetime.datetime.fromtimestamp(at)
+		print(at.tzinfo)
 	st = at.strftime(_ISO8601_TIME_FORMAT)
 	tz = at.tzinfo.tzname(None) if at.tzinfo else 'UTC'
 	st += ('Z' if tz == 'UTC' else tz)
@@ -46,12 +50,16 @@ def isotime(at=None):
 def date(at=None):
 	if not at:
 		at = now()
+	if type(at) == float:
+		at = datetime.datetime.fromtimestamp(at)
 	st = at.strftime(_DATE_FORMAT)
 	return st
 
 def time(at=None):
 	if not at:
 		at = now()
+	if type(at) == float:
+		at = datetime.datetime.fromtimestamp(at)
 	st = at.strftime(_TIME_FORMAT)
 	return st
 
@@ -204,6 +212,7 @@ class Scripting(Module):
 			"date": date,
 			"time": time,
 			"isotime" : isotime,
+			"unixtime" : unixtime,
 			"uuid": uuid,
 			"ping": ping,
 			"alive": alive,
@@ -214,11 +223,13 @@ class Scripting(Module):
 	}
 
 	def __init__(self, search_engine_file=None, **keywords):
-		super(Scripting, self).__init__([MUC, CONFIG, COMMAND],
-				name=__name__, **keywords)
+		super(Scripting, self).__init__([PRESENCE, MUC, CONFIG,
+				COMMAND], name=__name__, **keywords)
 
 		self.search_engine_file = search_engine_file
 		self.variables = {}
+		self.participants = {}
+		self.room_jid = None
 
 		functions = {
 			"search": self.search,
@@ -228,6 +239,7 @@ class Scripting(Module):
 			self.functions[key] = functions[key]
 
 		self.send_cmd("get_config", key="variables", default={})
+		self.send_cmd("get_room_info")
 		self.reload_config()
 
 	def reload_config(self):
@@ -239,6 +251,22 @@ class Scripting(Module):
 				self.variables = keywords["value"]
 		elif cmd == "config_values":
 			self.variables = keywords["value"]["variables"]
+		elif cmd == "room_info":
+			self.participants = {}
+			participants = keywords["participants"]
+			for participant_jid in participants:
+				participant = participants[participant_jid]
+				self.participants[participant["nick"]] = \
+						participant
+			self.room_jid = keywords["jid"]
+
+	def muc_online(self, jid, nick, role, affiliation, **keywords):
+		self.participants[nick] = {'jid': jid, 'nick': nick,
+				'role': role, 'affiliation': affiliation,
+				'time': unixtime()}
+
+	def muc_offline(self, nick, **keywords):
+		del self.participants[nick]
 
 	def evaluate(self, expr):
 		x = ast.parse(expr)
@@ -262,16 +290,14 @@ class Scripting(Module):
 		elif isinstance(node, ast.Return):
 			raise ReturnException(self._eval(node.value))
 		elif isinstance(node, ast.Attribute):
-			raise NotImplemented
+			value = self._eval(node.value)
+			return value.__getattr__(node.attr)
 		elif isinstance(node, ast.List):
 			return [ self._eval(x) for x in node.elts ]
 		elif isinstance(node, ast.Tuple):
 			return tuple([ self._eval(x) for x in node.elts ])
 		elif isinstance(node, ast.Subscript):
-			if isinstance(node.value, ast.Name):
-				target = self.variables[node.value.id]
-			else:
-				target = self._eval(node.value)
+			target = self._eval(node.value)
 			if isinstance(node.slice, ast.Index):
 				value = self._eval(node.slice.value)
 				return target[value]
@@ -379,10 +405,27 @@ class Scripting(Module):
 		raise TypeError(op)
 
 	def muc_msg(self, msg, nick, jid, role, affiliation, **keywords):
+		class Participant(dict):
+			def __init__(self, *args):
+				super(Participant, self).__init__(*args)
+			def __getattr__(self, key):
+				return self.__getitem__(key)
+			def __str__(self):
+				return str({'jid': self.jid, 'nick': self.nick,
+						'role': self.role,
+						'affiliation': self.affiliation,
+						'time': self.time})
+			def __repr__(self):
+				return self.__str__()
+
+		participants = { p : Participant(self.participants[p]) \
+				for p in self.participants }
 		self.constants['__nick__'] = nick
 		self.constants['__jid__'] = jid
 		self.constants['__role__'] = role
 		self.constants['__affiliation__'] = affiliation
+		self.constants['__participants__'] = participants
+		self.constants['__room_jid__'] = self.room_jid
 		def allowed(c):
 			if c in ["\r", "\n", "\t"]:
 				return True
