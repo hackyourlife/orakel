@@ -10,10 +10,10 @@ from autocmd import AutoCMD
 from mute import Mute
 
 class Admin(Module):
-	def __init__(self):
+	def __init__(self, trollmsg):
 		super(Admin, self).__init__(name="admin")
 		self.admincmd = AdminCMD(parent=self)
-		self.autocmd = AutoCMD(parent=self)
+		self.autocmd = AutoCMD(trollmsg, parent=self)
 		self.mute = Mute(parent=self)
 		self.log.info("load complete")
 
@@ -24,12 +24,9 @@ if __name__ == "__main__":
 	filename = "orakel.cfg"
 	config = configparser.SafeConfigParser()
 	config.read(filename)
-	questions = config.get("db", "questions")
-	search_engines = config.get("db", "searchengines")
-	storage = config.get("db", "storage")
-	maxlength = config.getint("modules", "flooding")
-	paste = config.get("modules", "paste")
-	admin = Admin()
+	troll = config.get("modules", "troll")
+	troll = [x.strip() for x in troll.split(';') if x.strip() != '']
+	admin = Admin(troll)
 	try:
 		admin.start()
 	except KeyboardInterrupt:
