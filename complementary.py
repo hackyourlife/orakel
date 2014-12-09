@@ -7,12 +7,14 @@ import logging
 from module import Module
 from scripting import Scripting
 from cookies import Cookies
+from dice import Dice
 
 class Complementary(Module):
 	def __init__(self, search_engines):
 		super(Complementary, self).__init__(name="complementary")
 		self.scripting = Scripting(search_engines, parent=self)
 		self.cookies = Cookies(parent=self)
+		self.dice = Dice(parent=self)
 		self.log.info("load complete")
 
 if __name__ == "__main__":
