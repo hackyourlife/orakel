@@ -10,11 +10,13 @@ class Dice(Module):
 		super(Dice, self).__init__([MUC], name=__name__, **keywords)
 
 	def muc_msg(self, msg, nick, **keywords):
-		r = r'^([0-9]+)d([0-9]+)$'
+		r = r'^dice ([0-9]+)?d([0-9]+)?$'
 		match = re.match(r, msg)
 		if match:
-			dice = int(match.group(1))
-			eyes = int(match.group(2))
+			dice = int(match.group(1)) if \
+					not match.group(1) is None else 1
+			eyes = int(match.group(2)) if \
+					not match.group(2) is None else 6
 			result = sum([ randrange(1, eyes + 1) \
 					for x in range(dice)])
 			self.send_muc(str(result))
