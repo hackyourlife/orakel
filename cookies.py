@@ -36,7 +36,7 @@ class Cookies(Module):
 		elif now.month == 4:
 			cookies += ["Osterhasen", "Lamm"]
 
-		if now.hour >= 16:
+		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
 		r = r'(?i)^([a-z-]+-)?keks für (\w+)(!|\?)?$'
