@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
-from random import randrange as random
+from random import SystemRandom
+
+def randrange(*args):
+	return SystemRandom().randrange(*args)
 
 def oneof(values):
-	return values[random(len(values))]
+	return SystemRandom().choice(values)
 
 def startswith(a, b):
 	if len(b) > len(a):
