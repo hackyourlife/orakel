@@ -27,6 +27,7 @@ from status import Status
 from url_title import Urltitle
 from finder import Finder
 from hands import Hands
+from weather import Weather
 
 if sys.version_info < (3, 0):
 	reload(sys)
@@ -81,6 +82,7 @@ if __name__ == "__main__":
 	#urltitle = Urltitle()
 	#finder = Finder()
 	hands = Hands(storage, conf, config.get("modules", "hands"))
+	weather = Weather(storage, conf, config.get("modules", "hands"))
 	mute = Mute(storage)
 
 	conf.add_handler('mute', mute.config_handler)
@@ -115,6 +117,7 @@ if __name__ == "__main__":
 	xmpp.add_online_listener(mute.on_online)
 	#xmpp.add_message_listener(finder)
 	xmpp.add_message_listener(hands)
+	xmpp.add_message_listener(weather)
 
 	def get_participants():
 		return xmpp.participants
