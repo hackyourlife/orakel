@@ -24,7 +24,7 @@ class Cookies(Module):
 				"Energy-Drink", "Regenbogen", "Burger", "Wein",
 				"Vanille", "Lima", "Wolken", "Schoko",
 				"Erdbeer", "Veggie", "Cola", "Limo",  "Karamel",
-				"Ananas", "Schinken"]
+				"Ananas", "Schinken", "Kaffee", "Koffein"]
 
 
 		now = datetime.datetime.now()
