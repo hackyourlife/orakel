@@ -8,6 +8,7 @@ from module import Module
 from scripting import Scripting
 from cookies import Cookies
 from dice import Dice
+from masochist import Masochist
 
 class Complementary(Module):
 	def __init__(self, search_engines):
@@ -15,6 +16,7 @@ class Complementary(Module):
 		self.scripting = Scripting(search_engines, parent=self)
 		self.cookies = Cookies(parent=self)
 		self.dice = Dice(parent=self)
+		self.masochist = Masochist(parent=self)
 		self.log.info("load complete")
 
 if __name__ == "__main__":
