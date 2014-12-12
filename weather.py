@@ -2,59 +2,49 @@
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
 import requests
-from time import time
+from urllib.parse import quote as urlencode
+from module import Module, CONFIG, COMMAND
 
-class Weather(object):
-	def __init__(self, storage, config, weather):
-		self.storage = storage
-		self.config = config
-		self.weather = weather
+class Weather(Module):
+	def __init__(self, **keywords):
+		super(Weather, self).__init__([CONFIG, COMMAND], name=__name__,
+				**keywords)
+
+	def get_weather(self, location, days=0):
+		encoded = urlencode(location)
+		no_data = "Keine Wetterdaten gefunden"
 		try:
-			self.storage['lastweather']
-		except:
-			self.storage['lastweather'] = 0
-
-	def action(self, msg, send_message):
-		try:
-			print(msg.lower())
-			if "!wetter" in msg.lower() or "!weather" in msg.lower():
-				data = msg.split(' ')
-				print(len(data))
-				if len(data) == 2:
-					api_url = 'http://api.openweathermap.org/data/2.5/weather?q='+data[1]+'&units=metric&lang=de'
-					r = requests.get(api_url)
-					json =  r.json()
-					cod = str(json['cod'])
-					temp = str(json['main']['temp'])
-					description = json['weather'][0]['description']
-					if cod == '404':
-						send_message('Keine Wetterdaten gefunden')
-					else:
-						send_message('Es hat '+temp+'°C und ist '+description)
-				elif len(data) == 3:
-					print(len(data))
-					api_url = 'http://api.openweathermap.org/data/2.5/forecast/daily?q='+data[1]+'&mode=json&units=metric&lang=de&cnt='+data[2]
-					r = request.get(api_url)
-					json = r.json()
-					cod = str(json['cod'])
-					day = json['list'][-1]
-					tmin = str(day['temp']['min'])
-					tmax = str(day['temp']['max'])
-					description = day['description']
-					send_message('In '+data[2]-1+' Tagen wird es minimal '+tmin+'°C und maximal '+tmax+'°C haben. Es wird '+description+' sein')
-				else:
-					send_message('Falsches Format')
-
-			return True
-		except:
-			return False
-
-	def __call__(self, msg, nick, send_message):
-		t = time()
-		if (t - self.storage['lastweather']) < \
-				self.config.getint("timeouts", "weather"):
-			return False
-		if not self.action(msg, send_message):
-			return False
-		self.storage['lastweather'] = t
-		return True
+			if days > 0:
+				api_url = "http://api.openweathermap.org/data/"\
+						"2.5/forecast/daily?q=%s" \
+						"&mode=json&units=metric" \
+						"&lang=de&cnt=%d" % \
+								(encoded, days)
+				r = requests.get(api_url)
+				json = r.json()
+				cod = json['cod']
+				day = json['list'][-1]
+				tmin = str(day['temp']['min'])
+				tmax = str(day['temp']['max'])
+				description = day['description']
+				if cod == 404:
+					return no_data
+				return "In %d Tagen wird es minimal %2f°C und" \
+						" maximal %2f°C haben." \
+						" Es wird %s sein" % (days,
+								tmin, tmax)
+			else:
+				api_url = "http://api.openweathermap.org/data/"\
+						"2.5/weather?q=%s" \
+						"&units=metric&lang=de"
+				r = requests.get(api_url)
+				json =  r.json()
+				cod = json['cod']
+				temp = json['main']['temp']
+				description = json['weather'][0]['description']
+				if cod == 404:
+					return no_data
+				return "Es hat %2f°C und ist %s" % \
+						(temp, description)
+		except Exception as e:
+			self.log("Exception caught: %s" % str(e))
