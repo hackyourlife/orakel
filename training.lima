@@ -30,6 +30,7 @@ metafrage;ist der burgi da?
 metafrage;ist burgi da?
 metafrage;ist burgi hier?
 metafrage;hey kennt sich einer von euch mit joomla und lima city aus?
+metafrage;kennt sich jemand aus mit SWF Musik datei einbinden
 #metafrage;Hey? Kennt sich einer von euch bisschen mit TV-Empfang aus?
 down;ist eure Homepage auch noch down?
 down;hat jemand anderes auch Probleme mit der Website?
@@ -59,7 +60,10 @@ fragen;Ich habe ein Problem
 fragen;Hallo, ich habe mal eine Frage
 fragen;kann mir jemand helfen?
 fragen;ich habe ein Problem
+fragen;hallo hab ein probelm
 ja;Erlaubt Lima-City .htacced Weiterleitungen?
+ja;Erlaubt Lima-City .htaccess Weiterleitungen?
+ja;Erlaubt Lima-City .htaccess Dateien?
 ja;Kann man hier eigene html Dateien Hochladen?
 ja;Kann ich bei Lima-City auch mein eigenen Domain aufschalten?
 ja;kann man wordpress installieren?
