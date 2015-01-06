@@ -57,11 +57,14 @@ class Sender(object):
 		def worker():
 			while self.running:
 				msg = self.queue.get()
-				self.channel.basic_publish(
-						exchange=self.exchange,
-						routing_key=msg['routing_key'],
-						body=msg['body'])
-				self.queue.task_done()
+				try:
+					self.channel.basic_publish(
+							exchange=self.exchange,
+							routing_key=msg['routing_key'],
+							body=msg['body'])
+				except Exception as e:
+					log.error("Messaging error: %s" % e)
+				self.queue.task_done() # fixme: retry
 		t = threading.Thread(target=worker)
 		t.daemon = True
 		t.start()
@@ -78,17 +81,16 @@ if __name__ == "__main__":
 	## ugly workaround because pika does not like multiple threads
 	#send_connection, exchange = open_connection()
 	#send_channel = send_connection.channel()
-	#sender = Sender(send_channel, exchange)
-	#sender.start()
-	#sender = Sender(send_channel, exchange)
-
-	#def send(key, data):
-	#	sender.send(routing_key=key,
-	#		body=json.dumps(data).encode('utf-8'))
+	sender = Sender(channel, exchange)
+	sender.start()
 
 	def send(key, data):
-		channel.basic_publish(exchange=exchange, routing_key=key,
-				body=json.dumps(data).encode('utf-8'))
+		sender.send(routing_key=key,
+			body=json.dumps(data).encode('utf-8'))
+
+	#def send(key, data):
+	#	channel.basic_publish(exchange=exchange, routing_key=key,
+	#			body=json.dumps(data).encode('utf-8'))
 
 	def receive(ch, method, properties, body):
 		routing_key = method.routing_key
@@ -194,7 +196,7 @@ if __name__ == "__main__":
 		channel.start_consuming()
 	except KeyboardInterrupt: pass
 
-	#sender.stop()
+	sender.stop()
 	xmpp.disconnect()
 	connection.close()
 	#send_connection.close()
