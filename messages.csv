@@ -40,6 +40,7 @@ ticket;https://www.lima-city.de/usercp/tickets/
 tickets;https://www.lima-city.de/usercp/tickets/
 talkr;https://jabber.lima-city.de/
 webchat;https://jabber.lima-city.de/
+jabber;https://www.lima-city.de/hilfe/jabber
 rm;https://www.lima-city.de/usercp/delete-account
 delete;https://www.lima-city.de/usercp/page%3Adelete
 phpinfo;http://system.lima-city.de/info.php
