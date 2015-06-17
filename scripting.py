@@ -11,6 +11,8 @@ import icmplib
 import random
 import traceback
 import signal
+from lisp import parse as lisp_parse, execute as lisp_execute, \
+		create_default_context
 from contextlib import contextmanager
 from utils import oneof, load_database
 from module import Module, PRESENCE, MUC, CONFIG, COMMAND
@@ -190,6 +192,10 @@ class Scripting(Module):
 			result = result[:750] + ["…"]
 		self.send_muc("".join(result))
 
+	def do_lisp(self, code):
+		ast = lisp_parse(code)
+		return lisp_execute(self.lisp_context, ast)
+
 	functions  = {	"sin": math.sin,
 			"cos": math.cos,
 			"tan": math.tan,
@@ -251,6 +257,7 @@ class Scripting(Module):
 		self.variables = {}
 		self.participants = {}
 		self.room_jid = None
+		self.lisp_context = create_default_context()
 
 		functions = {
 			"search": self.search,
