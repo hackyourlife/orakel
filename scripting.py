@@ -12,7 +12,7 @@ import random
 import traceback
 import signal
 from lisp import parse as lisp_parse, execute as lisp_execute, \
-		create_default_context
+		create_default_context, set_print_function
 from contextlib import contextmanager
 from utils import oneof, load_database
 from module import Module, PRESENCE, MUC, CONFIG, COMMAND
@@ -193,6 +193,7 @@ class Scripting(Module):
 		self.send_muc("".join(result))
 
 	def do_lisp(self, code):
+		set_print_function(lambda x: self.do_print(x))
 		ast = lisp_parse(code)
 		return lisp_execute(self.lisp_context, ast)
 

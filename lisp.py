@@ -1,4 +1,3 @@
-#!/bin/python
 # -*- coding: utf-8 -*-
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
@@ -62,6 +61,13 @@ class Context(object):
 		return str(self.concat())
 	def __repr__(self):
 		return self.__str__()
+
+def print_stdout(x):
+	print(x)
+
+def set_print_function(x):
+	global print_stdout
+	print_stdout = x
 
 def parse(text):
 	ast = []
@@ -282,15 +288,22 @@ def do_getidx(context, string, index):
 	i = lisp_eval(context, index)
 	return s[i]
 
+def do_sprintf(context, *args):
+	if len(args) > 1:
+		values = [ lisp_eval(context, arg) for arg in args ]
+		return values[0] % tuple(values[1:])
+	else:
+		return args[0]
+
 def do_print(context, *args):
-	print(*[ lisp_eval(context, arg) for arg in args ])
+	print_stdout(*[ lisp_eval(context, arg) for arg in args ])
 
 def do_printf(context, *args):
 	if len(args) > 1:
 		values = [ lisp_eval(context, arg) for arg in args ]
-		print(values[0] % tuple(values[1:]))
+		print_stdout(values[0] % tuple(values[1:]))
 	else:
-		print(*args)
+		print_stdout(*args)
 
 def lisp_replace_variables(code, context):
 	#print("REPLACE[%s]" % (str(code)))
@@ -340,6 +353,7 @@ methods = {
 		'progn':	do_progn,
 		'substr':	do_substr,
 		'getidx':	do_getidx,
+		'sprintf':	do_sprintf,
 		'print':	do_print,
 		'printf':	do_printf
 }
@@ -424,7 +438,8 @@ if __name__ == "__main__":
 (printf "%d" (funcall (lambda (x y) (* x y) (+ x y)) 2 3))
 (printf "[3] = '%c'" (getidx "hello" 3))
 (printf "a \"quote\"")
+(printf "sprintf says: '%s'" (sprintf "x = %d" 7))
 	"""
 
-	ast = lisp_parse(code)
-	lisp_run(context, ast)
+	ast = parse(code)
+	execute(context, ast)
