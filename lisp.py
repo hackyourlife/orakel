@@ -158,7 +158,10 @@ def parse(text):
 			return ast
 
 def do_add(context, *args):
-	return sum(lisp_eval(context, x) for x in args)
+	v = lisp_eval(context, args[0])
+	for arg in args[1:]:
+		v += lisp_eval(context, arg)
+	return v
 
 def do_sub(context, a, b):
 	a = lisp_eval(context, a)
@@ -166,8 +169,8 @@ def do_sub(context, a, b):
 	return a - b
 
 def do_mul(context, *args):
-	p = 1
-	for arg in args:
+	p = lisp_eval(context, args[0])
+	for arg in args[1:]:
 		p *= lisp_eval(context, arg)
 	return p
 
@@ -268,8 +271,8 @@ def do_funcall(context, function, *args):
 	a = [ lisp_eval(context, x) for x in args ]
 	return lisp_run_function(context, function, *a)
 
-def do_list(context, *value):
-	return lisp_eval(context, values)
+def do_list(context, *values):
+	return [ lisp_eval(context, value) for value in values ]
 
 def do_progn(context, *expressions):
 	r = None
