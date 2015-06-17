@@ -263,7 +263,8 @@ class Scripting(Module):
 			"search": self.search,
 			"vars": self._vars,
 			"print": self.do_print,
-			"eval": self.do_eval }
+			"eval": self.do_eval,
+			"lisp": self.do_lisp }
 		for key in functions.keys():
 			self.functions[key] = functions[key]
 
