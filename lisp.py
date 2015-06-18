@@ -318,6 +318,8 @@ def do_search(context, regex, text):
 
 def do_method(context, method, obj, *args):
 	method = lisp_eval(context, method)
+	if type(method) != str:
+		raise SyntaxError("need string for method name")
 	obj = lisp_eval(context, obj)
 	a = [ lisp_eval(context, arg) for arg in args ]
 	return getattr(obj, method)(*a)
@@ -351,24 +353,13 @@ def do_printf(context, *args):
 	else:
 		print_stdout(*args)
 
-def lisp_replace_variables(code, context):
-	#print("REPLACE[%s]" % (str(code)))
-	def replace(x):
-		if type(x) == Identifier and x.name in context:
-			return context[x.name]
-		if type(x) == list:
-			return lisp_replace_variables(x, context)
-		return x
-	if type(code) == list or type(code) == tuple:
-		return [ replace(x) for x in code ]
-	return replace(code)
-
 def lisp_run_function(context, function, *args):
 	signature = function.args
 	replacements = { signature[i].name: lisp_eval(context, args[i]) \
 			for i in range(len(signature)) }
-	code = lisp_replace_variables(function.code, replacements)
-	return lisp_run(context, code)
+	ctx = Context(context)
+	ctx.overlay = replacements
+	return lisp_run(ctx, function.code)
 
 methods = {
 		'+':		do_add,
@@ -425,7 +416,9 @@ def create_default_context():
 
 def lisp_call(context, method, *args):
 	global methods
-	if method in context:
+	if type(method) == Function:
+		return lisp_run_function(context, method, *args)
+	elif method in context:
 		return lisp_run_function(context, context[method], *args)
 	elif method in methods:
 		return methods[method](context, *args)
@@ -453,12 +446,14 @@ def lisp_eval(context, expression):
 		return expression
 	elif type(expression) == Identifier:
 		return context[expression.name]
+	elif type(expression) == Function:
+		return lisp_call(context, *expression)
 	raise SyntaxError("unexpected token type")
 
 def lisp_run(context, ast):
 	rv = None
 	for expression in ast:
-		rv = lisp_run_expr(context, expression)
+		rv = lisp_eval(context, expression)
 	return rv
 
 execute = lisp_run
@@ -502,6 +497,12 @@ if __name__ == "__main__":
 		(put (put x "x" "y") "r" 7)
 		(print x)))
 (let ((x (list 19 43 2))) (printf "x[1] = %d" (get x 1)))
+(let ((x "Hello, World!") (r (regex "([A-Za-z][a-z]*)")))
+	(let ((match (method "match" r x)))
+		(printf "does it match? %s" (if match "yes" "no"))
+		(when match
+			(printf "the match: %s" (method "group" match 1))))
+)
 	"""
 
 	ast = parse(code)
