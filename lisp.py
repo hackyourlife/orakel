@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vim:set ts=8 sts=8 sw=8 tw=80 noet cc=80:
 
+import re
+
 WHITESPACE = [' ', '\r', '\n', '\t']
 
 class Identifier(object):
@@ -271,7 +273,9 @@ def do_defconstant(context, name, value):
 	context[name.name] = lisp_eval(context, value)
 
 def do_set(context, name, value):
-	context[name] = lisp_eval(context, value)
+	if type(name) != Identifier:
+		raise SyntaxError("identifier expected")
+	context[name.name] = lisp_eval(context, value)
 
 def do_lambda(context, args, *content):
 	return Function(None, args, list(content))
@@ -305,6 +309,18 @@ def do_get(context, string, index):
 	s = lisp_eval(context, string)
 	i = lisp_eval(context, index)
 	return s[i]
+
+def do_regex(context, regex):
+	return re.compile(lisp_eval(context, regex))
+
+def do_search(context, regex, text):
+	return re.search(lisp_eval(context, regex), lisp_eval(context, text))
+
+def do_method(context, method, obj, *args):
+	method = lisp_eval(context, method)
+	obj = lisp_eval(context, obj)
+	a = [ lisp_eval(context, arg) for arg in args ]
+	return getattr(obj, method)(*a)
 
 def do_progn(context, *expressions):
 	r = None
@@ -386,6 +402,9 @@ methods = {
 		'dict':		do_dict,
 		'put':		do_put,
 		'get':		do_get,
+		'regex':	do_regex,
+		'search':	do_search,
+		'method':	do_method,
 		'progn':	do_progn,
 		'substr':	do_substr,
 		'sprintf':	do_sprintf,
