@@ -179,6 +179,11 @@ def do_div(context, a, b):
 	b = lisp_eval(context, b)
 	return a / b
 
+def do_mod(context, a, b):
+	a = lisp_eval(context, a)
+	b = lisp_eval(context, b)
+	return a % b
+
 def do_inc(context, x):
 	return lisp_eval(context, x) + 1
 
@@ -223,6 +228,11 @@ def do_or(context, a, b):
 	b = lisp_eval(context, b)
 	return a or b
 
+def do_xor(context, a, b):
+	a = lisp_eval(context, a)
+	b = lisp_eval(context, b)
+	return a ^ b
+
 def do_if(context, test, when, otherwise):
 	c = lisp_eval(context, test)
 	if c:
@@ -241,7 +251,7 @@ def do_let(context, variables, *methods):
 	overlay = {}
 	for var in variables:
 		if type(var) != list:
-			raise SyntaxError("can only process lists")
+			raise SyntaxError("list expected")
 		if len(var) != 2:
 			raise SyntaxError("exactly two token required")
 		if type(var[0]) != Identifier:
@@ -274,6 +284,28 @@ def do_funcall(context, function, *args):
 def do_list(context, *values):
 	return [ lisp_eval(context, value) for value in values ]
 
+def do_dict(context, *values):
+	v = {}
+	for entry in values:
+		if type(entry) != list:
+			raise SyntaxError("list expected")
+		if len(entry) != 2:
+			raise SyntaxError("exactly two token required")
+		v[lisp_eval(context, entry[0])] = lisp_eval(context, entry[1])
+	return v
+
+def do_put(context, data, key, value):
+	d = lisp_eval(context, data)
+	k = lisp_eval(context, key)
+	v = lisp_eval(context, value)
+	d[k] = v
+	return d
+
+def do_get(context, string, index):
+	s = lisp_eval(context, string)
+	i = lisp_eval(context, index)
+	return s[i]
+
 def do_progn(context, *expressions):
 	r = None
 	for expression in expressions:
@@ -285,11 +317,6 @@ def do_substr(context, string, start, stop=None):
 	if stop == None:
 		return s[start:]
 	return s[start:stop]
-
-def do_getidx(context, string, index):
-	s = lisp_eval(context, string)
-	i = lisp_eval(context, index)
-	return s[i]
 
 def do_sprintf(context, *args):
 	if len(args) > 1:
@@ -332,6 +359,7 @@ methods = {
 		'-':		do_sub,
 		'*':		do_mul,
 		'/':		do_div,
+		'mod':		do_mod,
 		'1+':		do_inc,
 		'1-':		do_dec,
 		'<':		do_lt,
@@ -342,8 +370,10 @@ methods = {
 		'not':		do_not,
 		'and':		do_and,
 		'or':		do_or,
+		'xor':		do_xor,
 		'&':		do_and,
 		'|':		do_or,
+		'^':		do_xor,
 		'if':		do_if,
 		'when':		do_when,
 		'let':		do_let,
@@ -353,9 +383,11 @@ methods = {
 		'lambda':	do_lambda,
 		'funcall':	do_funcall,
 		'list':		do_list,
+		'dict':		do_dict,
+		'put':		do_put,
+		'get':		do_get,
 		'progn':	do_progn,
 		'substr':	do_substr,
-		'getidx':	do_getidx,
 		'sprintf':	do_sprintf,
 		'print':	do_print,
 		'printf':	do_printf
@@ -439,9 +471,18 @@ if __name__ == "__main__":
 (printf "%s" (lambda (x y) (+ x y)))
 (funcall (lambda (x y) (printf "%d + %d = %d" x y (+ x y))) 2 3)
 (printf "%d" (funcall (lambda (x y) (* x y) (+ x y)) 2 3))
-(printf "[3] = '%c'" (getidx "hello" 3))
+(printf "[3] = '%c'" (get "hello" 3))
 (printf "a \"quote\"")
 (printf "sprintf says: '%s'" (sprintf "x = %d" 7))
+
+(let ((x (dict
+		("abc" 21)
+		("def" 13))))
+	(progn
+		(put x "a" "b")
+		(put (put x "x" "y") "r" 7)
+		(print x)))
+(let ((x (list 19 43 2))) (printf "x[1] = %d" (get x 1)))
 	"""
 
 	ast = parse(code)
