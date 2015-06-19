@@ -145,12 +145,14 @@ def parse(text):
 
 			i += 1
 			if i >= l:
-				append()
-				return v, l
+				raise SyntaxError("missing ')'")
 
 	while True:
 		code = text[i:]
 		if not '(' in code: # no more expressions
+			for c in code:
+				if not c in WHITESPACE:
+					raise SyntaxError("unexpected '%c'" % c)
 			return ast
 
 		tree, end = parse_lisp_internal(code)
@@ -507,3 +509,12 @@ if __name__ == "__main__":
 
 	ast = parse(code)
 	execute(context, ast)
+
+	try:
+		ast = parse("((bla)")
+	except SyntaxError as e:
+		print("Error 1: %s" % e)
+	try:
+		ast = parse("(bla))")
+	except SyntaxError as e:
+		print("Error 2: %s" % e)
