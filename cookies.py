@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # vim:set ts=8 sts=8 sw=8 tw=80 noet:
 
 import re
@@ -39,7 +40,7 @@ class Cookies(Module):
 		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
-		r = r'(?i)^([a-z-]+-)?keks für (\w+)(!|\?)?$'
+		r = r'(?i)^(\w[\w-]*-)?keks für (\w+)(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
