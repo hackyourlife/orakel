@@ -10,12 +10,15 @@ class Online(Module):
 		self.send_cmd("get_room_info")
 
 	def muc_mention(self, msg, **keywords):
-		if msg.startswith("ist ") and (msg.endswith(" online?") \
-				or msg.endswith(" online")):
-			u = msg[12:-8].strip()
-			for n in self.participants:
-				if u == n or u + "@webchat" == n \
-						or self.participants[n]["jid"].split("@")[0] == u:
-					self.send_muc("Ja, %s ist online." % n)
-					return
-			self.send_muc("Nein, %s ist nicht online." % u)
+		if not (msg.startswith("ist ") and (msg.endswith(" online?") \
+				or msg.endswith(" online"))):
+			return
+		u = msg[4:-8].strip()
+		if len(u) == 0:
+			return
+		for n in self.participants:
+			if u == n or u + "@webchat" == n \
+					or self.participants[n]["jid"].split("@")[0] == u:
+				self.send_muc("Ja, %s ist online." % n)
+				return
+		self.send_muc("Nein, %s ist nicht online." % u)
