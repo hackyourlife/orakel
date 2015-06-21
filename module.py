@@ -227,7 +227,7 @@ class Module(object):
 			if cmd == "room_info":
 				data = args["participants"]
 				participants = {}
-				for jid in args:
+				for jid in data:
 					participant = data[jid]
 					participants[participant["nick"]] = \
 							participant

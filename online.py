@@ -13,7 +13,7 @@ class Online(Module):
 		if not (msg.startswith("ist ") and (msg.endswith(" online?") \
 				or msg.endswith(" online"))):
 			return
-		u = msg[4:-8].strip()
+		u = msg[4:-7].strip()
 		if len(u) == 0:
 			return
 		for n in self.participants:
