@@ -5,6 +5,7 @@ import json
 import logging
 import traceback
 import messaging
+from time import time as unixtime
 from log import Log
 from messaging import Sender
 
@@ -28,6 +29,7 @@ class Module(object):
 		self.listeners = []
 		self.topics = []
 		self.name = __name__ if name is None else name
+		self.participants = {}
 		self.log = Log(self.name, self.do_log)
 		if parent:
 			parent.register(self, topics)
@@ -190,11 +192,15 @@ class Module(object):
 
 	# override those functions
 	def muc_online(self, nick, jid, role, affiliation):
+		self.participants[nick] = {'jid': jid, 'nick': nick,
+				'role': role, 'affiliation': affiliation,
+				'time': unixtime() }
 		for listener in self.listeners:
 			listener.muc_online(nick=nick, jid=jid, role=role,
 					affiliation=affiliation)
 
 	def muc_offline(self, nick, jid):
+		del self.participants[nick]
 		for listener in self.listeners:
 			listener.muc_offline(nick=nick, jid=jid)
 
@@ -217,6 +223,18 @@ class Module(object):
 			listener.config_change(key=key, value=value)
 
 	def command(self, cmd, **args):
+		try:
+			if cmd == "room_info":
+				data = args["participants"]
+				participants = {}
+				for jid in args:
+					participant = data[jid]
+					participants[participant["nick"]] = \
+							participant
+				self.participants = participants
+		except Exception:
+			pass
+
 		for listener in self.listeners:
 			listener.command(cmd, **args)
 
