@@ -73,11 +73,11 @@ class AutoCMD(Module):
 			self.do_troll(nick)
 
 	def do_troll(self, nick):
-		if nick = "bw5rws":
-			self.send_private(nick, "Da hattest du wohl wieder keine Ahnung ...", muc=True)
-		else:
-			msg = oneof(self.trollmsg)
-			self.send_private(nick, msg, muc=True)
+		msg = oneof(self.trollmsg)
+		if nick == "bw5rws":
+			msg = oneof([msg,
+				"Da hattest du wohl wieder keine Ahnung ...")
+		self.send_private(nick, msg, muc=True)
 
 	def command(self, cmd, **keywords):
 		if cmd == "reregister_cli":
