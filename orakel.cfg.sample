@@ -1,0 +1,31 @@
+[messaging]
+hostname = 127.0.0.1
+username = guest
+password = guest
+exchange = oracle
+
+[xmpp]
+jid = account@jabber.server
+password = secret
+room = room@jabber.server
+nick = Orakel
+
+[db]
+questions = messages.csv
+searchengines = searchengines.csv
+storage = storage.json
+
+[modules]
+greetings = hallo,moin,hi,hai,servus,aloha,huhu
+hands = False
+flooding = 750
+paste = paste.service
+noalphabet = k,T
+op = moderator-nick
+troll = You are muted
+
+[timeouts]
+hands = 10
+greet = 120
+alphabet = 30
+count = 10

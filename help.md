@@ -37,11 +37,26 @@ Privater Chat
 * `?`: Liste aller geladenen Fragen wird ausgegeben
 * `ping` → `pong`
 
-Operator-Aktionen
------------------
-* `ops`: Liste der Operatoren wird angezeigt
-* `op nick`: `nick` wird als Operator hinzugefügt
-* `deop nick`: `nick` wird der Operator-Status entzogen
-* `trolled`: Liste aller getrollten wird angezeigt
-* `troll nick`: Der Benutzer `nick` bekommt bei jeder geschriebenen Zeile eine störende private Nachricht
-* `untroll nick`: Der Benutzer `nick` wird nicht länger getrollt
+Moderator-Aktionen
+=================
+
+Befehle
+-------
+
+* `kick <nick> [reason]`
+* `show auto kick jid`
+* `show auto kick nick`
+* `show mute`
+
+Konfiguration
+-------------
+
+* `auto kick jid <jid>`
+* `auto kick nick <nick>`
+* `troll jid <jid>`
+* `troll nick <nick>`
+* `mute <nick>`
+
+Konfigurationsanweisungen können durch ein vorangestelltes `no` wieder
+aufgehoben werden. Beispiel: `no mute user` hebt die Konfigurationsanweisung
+`mute user` auf.
