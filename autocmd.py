@@ -36,7 +36,7 @@ class AutoCMD(Module):
 		self.send_cmd("unregister_cli", name=["auto", "kick", "nick"],
 				argc=1)
 		self.send_cmd("unregister_cli", name=["auto", "kick", "jid"],
-				argc=1)
+				argc=1)
 		self.send_cmd("unregister_cli", name=["show", "auto", "kick",
 				"nick"], argc=0)
 		self.send_cmd("unregister_cli", name=["show", "auto", "kick",
@@ -73,8 +73,11 @@ class AutoCMD(Module):
 			self.do_troll(nick)
 
 	def do_troll(self, nick):
-		msg = oneof(self.trollmsg)
-		self.send_private(nick, msg, muc=True)
+		if nick = "bw5rws":
+			self.send_private(nick, "Da hattest du wohl wieder keine Ahnung ...", muc=True)
+		else:
+			msg = oneof(self.trollmsg)
+			self.send_private(nick, msg, muc=True)
 
 	def command(self, cmd, **keywords):
 		if cmd == "reregister_cli":
