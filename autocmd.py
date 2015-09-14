@@ -36,7 +36,7 @@ class AutoCMD(Module):
 		self.send_cmd("unregister_cli", name=["auto", "kick", "nick"],
 				argc=1)
 		self.send_cmd("unregister_cli", name=["auto", "kick", "jid"],
-				argc=1)
+				argc=1)
 		self.send_cmd("unregister_cli", name=["show", "auto", "kick",
 				"nick"], argc=0)
 		self.send_cmd("unregister_cli", name=["show", "auto", "kick",
@@ -76,7 +76,7 @@ class AutoCMD(Module):
 		msg = oneof(self.trollmsg)
 		if nick == "bw5rws":
 			msg = oneof([msg,
-				"Da hattest du wohl wieder keine Ahnung ...")
+				"Da hattest du wohl wieder keine Ahnung ..."])
 		self.send_private(nick, msg, muc=True)
 
 	def command(self, cmd, **keywords):
