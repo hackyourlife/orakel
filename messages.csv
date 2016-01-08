@@ -6,8 +6,8 @@ inhalte;https://www.lima-city.de/hilfe/welche-dateiformate-sind-auf-dem-webspace
 zip;https://www.lima-city.de/hilfe/welche-dateiformate-sind-auf-dem-webspace-verboten
 ftp;https://www.lima-city.de/usercp/ftp
 mysql;https://www.lima-city.de/usercp/databases
-pma;http://mysql.lima-city.de/
-phpmyadmin;http://mysql.lima-city.de/
+pma;https://pma.lima-city.de/
+phpmyadmin;https://pma.lima-city.de/
 filemanager;https://filemanager.lima-city.de/
 mail;https://mail.lima-city.de
 email;https://www.lima-city.de/hilfe/wie-kann-ich-meine-e-mail-adressen-einrichten
