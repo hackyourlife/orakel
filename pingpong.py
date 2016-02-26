@@ -12,8 +12,10 @@ class PingPong(Module):
 			}
 	users = {
 			'tchab': {
-				'ping': "Für dich immer noch »pink«!",
-				'*ping*': "Klappe zu, Schwulibert!"
+				'ping':  [ "Für dich immer noch »pink«!",
+					"Klappe zu, Schwulibert!"],
+				'*ping*': [ "Für dich immer noch »pink«!",
+					"Klappe zu, Schwulibert!" ]
 			}
 		}
 
@@ -25,7 +27,7 @@ class PingPong(Module):
 		key = msg.lower()
 		if key in self.mapping:
 			if nick in self.users and key in self.users[nick]:
-				self.send_muc(self.users[nick][key])
+				self.send_muc(oneof(self.users[nick][key]))
 			else:
 				self.send_muc(self.mapping[key])
 
@@ -34,7 +36,8 @@ class PingPong(Module):
 		if key in self.mapping:
 			if nick in self.users and key in self.users[nick]:
 				self.send_muc("%s: %s" % \
-						(nick, self.users[nick][key]))
+						(nick,
+						oneof(self.users[nick][key])))
 			else:
 				self.send_muc("%s: %s" % \
 						(nick, self.mapping[key]))
