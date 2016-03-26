@@ -123,6 +123,12 @@ def __time_limit(seconds):
 	finally:
 		signal.alarm(0)
 
+class XDict(dict):
+	def __init__(self, *args, **kwargs):
+		super(XDict, self).__init__(*args, **kwargs)
+	def __getattr__(self, name):
+		return self.__getitem__(name)
+
 class Scripting(Module):
 	# supported operators
 	operators = {	ast.Add: op.add,
@@ -166,6 +172,12 @@ class Scripting(Module):
 
 	constants = {	"pi": math.pi,
 			"π": math.pi,
+			"e" : math.e,
+			"math" : XDict({
+				"e": math.e,
+				"inf": math.inf,
+				"nan": math.nan,
+				"pi": math.pi }),
 			"True": True,
 			"False": False,
 			"None": None }
@@ -209,9 +221,17 @@ class Scripting(Module):
 			"asinh": math.asinh,
 			"acosh": math.acosh,
 			"atanh": math.atanh,
+			"atan2": math.atan2,
 			"log": math.log,
+			"log2": math.log2,
+			"log10": math.log10,
 			"exp": math.exp,
 			"sqrt": math.sqrt,
+			"factorial": math.factorial,
+			"trunc": math.trunc,
+			"floor": math.floor,
+			"ceil": math.ceil,
+			"gcd": math.gcd,
 			"abs": abs,
 			"all": all,
 			"any": any,
@@ -220,6 +240,7 @@ class Scripting(Module):
 			"chr": chr,
 			"complex": complex,
 			"dict": dict,
+			"dir": dir,
 			"float": float,
 			"hex": hex,
 			"int": int,
