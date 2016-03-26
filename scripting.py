@@ -330,7 +330,7 @@ class Scripting(Module):
 		elif isinstance(node, ast.Subscript):
 			target = self._eval(node.value, var)
 			if isinstance(node.slice, ast.Index):
-				value = self._eval(node.slice.value)
+				value = self._eval(node.slice.value, var)
 				return target[value]
 			else:
 				lower = self._eval(node.slice.lower, var)
