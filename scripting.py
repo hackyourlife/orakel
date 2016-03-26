@@ -522,8 +522,8 @@ class Scripting(Module):
 		self.constants['__affiliation__'] = affiliation
 		self.constants['__participants__'] = participants
 		self.constants['__room_jid__'] = self.room_jid
-		if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
-			return
+		#if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
+		#	return
 		if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
 			return
 		try:
