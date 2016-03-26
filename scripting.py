@@ -33,7 +33,6 @@ _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 _DATE_FORMAT = '%d.%m.%Y'
 _TIME_FORMAT = '%H:%M:%S'
 
-
 def uuid():
 	return str(guid.uuid4())
 
@@ -148,7 +147,7 @@ class Scripting(Module):
 			ast.Not: op.not_ }
 
 	attrfunctions = {
-			ast.Str: {
+			str: {
 				"capitalize": str.capitalize,
 				"index": str.index,
 				"isalnum": str.isalnum,
@@ -158,17 +157,23 @@ class Scripting(Module):
 				"isspace": str.isspace,
 				"istitle": str.istitle,
 				"isupper": str.isupper,
+				"isprintable": str.isprintable,
 				"join": str.join,
 				"lower": str.lower,
 				"replace": str.replace,
 				"split": str.split,
 				"splitlines": str.splitlines,
 				"startswith": str.startswith,
+				"endswith": str.endswith,
 				"strip": str.strip,
 				"swapcase": str.swapcase,
 				"title": str.title,
 				"upper": str.upper,
-				"zfill": str.zfill } }
+				"zfill": str.zfill },
+			dict: {
+				"get": dict.get,
+				"items": dict.items,
+				"keys": dict.keys } }
 
 	constants = {	"pi": math.pi,
 			"π": math.pi,
@@ -360,20 +365,30 @@ class Scripting(Module):
 				return target[lower:upper:step]
 		elif isinstance(node, ast.ListComp):
 			generator = node.generators[0]
-			target = generator.target.id
+			target = [ name.id for name in generator.target.elts ] \
+					if type(generator.target) == ast.Tuple \
+					else generator.target.id
 			items = self._eval(generator.iter, var)
 			if len(items) > 100:
 				raise Exception('too many iterations')
 			var_ = { x : var[x] for x in var }
 			def step(x, y, z):
-				var_[y] = z
+				if type(z) == tuple:
+					for i in range(len(y)):
+						var_[y[i]] = z[i]
+				else:
+					var_[y] = z
 				result = self._eval(x, var_)
 				return result
 			if len(generator.ifs) == 0:
 				return [ step(node.elt, target, x) \
 						for x in items ]
 			def ifs(x):
-				var_[target] = x
+				if type(x) == tuple:
+					for i in range(len(target)):
+						var_[target[i]] = x[i]
+				else:
+					var_[target] = x
 				v = True
 				for i in generator.ifs:
 					v = v and self._eval(i, var_)
@@ -385,12 +400,14 @@ class Scripting(Module):
 			if isinstance(node.func, ast.Attribute):
 				obj = node.func.value
 				func = node.func.attr
-				if type(obj) in self.attrfunctions:
-					function = self.attrfunctions[type(obj)][func]
-				else:
-					raise NotImplemented
 				args = [ self._eval(node.func.value, var) ] \
 						+ args
+				t = type(args[0])
+				if t in self.attrfunctions and \
+						func in self.attrfunctions[t]:
+					function = self.attrfunctions[t][func]
+				else:
+					raise NotImplementedError()
 			else:
 				function = self.functions[node.func.id]
 			return function(*args)
@@ -465,7 +482,7 @@ class Scripting(Module):
 						return True
 				return value
 			else:
-				raise NotImplemented
+				raise NotImplementedError()
 		elif isinstance(node, ast.NameConstant):
 			return node.value
 		elif isinstance(node, ast.IfExp):
