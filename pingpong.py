@@ -11,29 +11,31 @@ class PingPong(Module):
 			'pink':		'ponk'
 			}
 	users = {
-			'tchab': [
-				"Für dich immer noch »pink«!",
-				"Klappe zu, Schwulibert!"]
+			'tchab': {
+				'ping':  [ "Für dich immer noch »pink«!",
+					"Klappe zu, Schwulibert!"],
+				'*ping*': [ "Für dich immer noch »pink«!",
+					"Klappe zu, Schwulibert!" ]
 			}
+		}
 
 
 	def __init__(self, **keywords):
 		super(PingPong, self).__init__([MUC, MUC_MENTION], **keywords)
 
 	def muc_msg(self, msg, nick, **keywords):
-		key = msg.lower()
-		if key in self.mapping:
-			if nick in self.users:
-				self.send_muc(oneof(self.users[nick]))
-			else:
-				self.send_muc(self.mapping[key])
+		self.pingpong(msg, nick, "%s")
 
 	def muc_mention(self, msg, nick, **keywords):
+		self.pingpong(msg, nick, "%s: %%s" % nick)
+
+	def pingpong(self, msg, nick, formatstr):
 		key = msg.lower()
 		if key in self.mapping:
-			if nick in self.users:
-				self.send_muc("%s: %s" % \
-						(nick, oneof(self.users[nick])))
+			if nick in self.users and key in self.users[nick]:
+				self.send_muc(formatstr % \
+						oneof(self.users[nick][key]))
 			else:
-				self.send_muc("%s: %s" % \
-						(nick, self.mapping[key]))
+				self.send_muc(formatstr % \
+						self.mapping[key])
+
