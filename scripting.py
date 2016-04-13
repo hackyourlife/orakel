@@ -149,6 +149,7 @@ class Scripting(Module):
 	attrfunctions = {
 			str: {
 				"capitalize": str.capitalize,
+				"format": str.format,
 				"index": str.index,
 				"isalnum": str.isalnum,
 				"isalpha": str.isalpha,
