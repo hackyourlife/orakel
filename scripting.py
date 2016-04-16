@@ -542,11 +542,11 @@ class Scripting(Module):
 		self.constants['__room_jid__'] = self.room_jid
 		#if re.match(r'^\s*[a-zA-Z0-9]+[\.\s]*$', msg):
 		#	return
-		if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
-			return
+		#if re.match(r'^\s*[0-9]+\.[0-9]+\s*$', msg):
+		#	return
 		try:
-			if msg in self.variables:
-				return
+			#if msg in self.variables:
+			#	return
 			with time_limit(10):
 				result = self.evaluate(msg)
 			if not result is None:
