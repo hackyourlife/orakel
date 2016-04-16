@@ -52,7 +52,7 @@ class Cookies(Module):
 			elif match.group(2) in ["c143", "tse143", "tse", "c143po"]:
 				cookies = ["Bier", "Pizza", "Kartoffel", "Tofu",
 						"Salat", "Imaginären"]
-			elif match.group(2) in ["arcardy@webchat", "arcard"]
+			elif match.group(2) in ["arcardy@webchat", "arcardy"]
 				cookies = ["Gift", "Abgelaufenen", "Closed-Recipe",
 						"Plastik", "Python"]
 			if not match.group(1) is None:
