@@ -40,7 +40,7 @@ class Cookies(Module):
 		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
-		r = r'(?i)^(\w[\w-]*-?)?keks für ([\w@äöü\s_°/-]+\w)(!|\?)?$'
+		r = r'(?i)^(\w[\w-]*-?)?keks für ([\w@äöü\s_°/-]+[\w@äöü_°/-])(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
