@@ -40,7 +40,7 @@ class Cookies(Module):
 		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
-		r = r'(?i)^(\w[\w-]*-)?keks für (\w+)(!|\?)?$'
+		r = r'(?i)^(\w[\w-]*-?)?keks für ([\w@äöü\s_°/-]+[\w@äöü_°/-])(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
@@ -56,7 +56,10 @@ class Cookies(Module):
 				cookies = ["Closed-Recipe", "MSSQL", "Windows",
 						"Plastik", "Python"]
 			if not match.group(1) is None:
-				cookie = match.group(1)[:-1].split('-')
+				if match.group(1)[-1] == '-':
+					cookie = match.group(1)[:-1].split('-')
+				else:
+					cookie = match.group(1).split('-')
 				cookie = [x[0].upper() + x[1:].lower() \
 						for x in cookie]
 				cookies = [ "-".join(cookie) ]
