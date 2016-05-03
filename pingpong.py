@@ -30,12 +30,11 @@ class PingPong(Module):
 		self.pingpong(msg, nick, "%s: %%s" % nick)
 
 	def pingpong(self, msg, nick, formatstr):
-		key = msg.lower()
-		if key in self.mapping:
-			if nick in self.users and key in self.users[nick]:
-				self.send_muc(formatstr % \
-						oneof(self.users[nick][key]))
-			else:
-				self.send_muc(formatstr % \
-						self.mapping[key])
+		key = msg.lower();
+		if nick in self.users and key in self.users[nick]:
+			self.send_muc(formatstr % \
+					oneof(self.users[nick][key]))
+		elif key in self.mapping:
+			self.send_muc(formatstr % \
+					self.mapping[key])
 
