@@ -67,7 +67,11 @@ class Client(sleekxmpp.ClientXMPP):
 		affiliation = None
 		if len(nick) != 0:
 			jid = self.plugin['xep_0045'].getJidProperty(self.room,
-					nick, 'jid').full
+					nick, 'jid')
+			try:
+				jid = jid.full
+			except:
+				jid = ""
 			if len(jid) == 0:
 				jid = msg['from'].full
 			role = self.plugin['xep_0045'].getJidProperty(self.room,
