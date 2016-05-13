@@ -11,7 +11,8 @@ class Cookies(Module):
 		super(Cookies, self).__init__([MUC], name=__name__, **keywords)
 
 	def muc_msg(self, msg, nick, **keywords):
-		if "keks" in msg.lower():
+		m = msg.lower()
+		if "keks" in m or "cookie" in m:
 			result = self.handle(msg, nick)
 			if result:
 				self.send_muc(result)
@@ -42,7 +43,7 @@ class Cookies(Module):
 		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
-		r = r'(?i)^(\w[\w-]*-?)?(keks f(ü|ue)r|cookie for) ([\w@äöü\s_°/-]+[\w@äöü_°/-])(!|\?)?$'
+		r = r'(?i)^(\w[\w-]*-?)?(keks f(ü|ue)r|cookie for) ([\w@äöü\s_°/-]*[\w@äöü_°/-])(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
@@ -67,7 +68,7 @@ class Cookies(Module):
 				cookies = [ "-".join(cookie) ]
 			if match.group(5) == '?':
 				return 'nein!'
-		elif not msg.lower() in ['keks', 'keks?', 'keks!']:
+		elif not msg.lower() in ['keks', 'keks!', 'cookie', 'cookie!']:
 			return False
 
 		return "/me gibt %s einen %s-Keks." % (oneof(users),
