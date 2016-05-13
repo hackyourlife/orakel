@@ -25,7 +25,7 @@ class Cookies(Module):
 				"Energy-Drink", "Regenbogen", "Burger", "Wein",
 				"Vanille", "Lima", "Wolken", "Schoko",
 				"Erdbeer", "Veggie", "Cola", "Limo",  "Karamel",
-				"Ananas", "Schinken", "Kaffee", "Koffein", "Hack", 
+				"Ananas", "Schinken", "Kaffee", "Koffein", "Hack",
 				"Krümel", "Lachflash", "Kinder", "Apfel", "Bananen",
 				"Sarkasmus", "Ironie", "Klugscheißer", "Virtuellen"]
 
@@ -42,19 +42,19 @@ class Cookies(Module):
 		if now.hour >= 16 or now.weekday() >= 4:
 			cookies += ["Bier", "Bier", "Bier"]
 
-		r = r'(?i)^(\w[\w-]*-?)?keks für ([\w@äöü\s_°/-]+[\w@äöü_°/-])(!|\?)?$'
+		r = r'(?i)^(\w[\w-]*-?)?(keks f(ü|ue)r|cookie for) ([\w@äöü\s_°/-]+[\w@äöü_°/-])(!|\?)?$'
 		match = re.match(r, msg)
 
 		if match:
-			users = [match.group(2)]
-			if match.group(2) == "tchab":
+			users = [match.group(4)]
+			if match.group(4) == "tchab":
 				cookies = ["Regenbogen", "Wurst"]
-			elif match.group(2) in ["sonok", "snook", "Socke"]:
+			elif match.group(4) in ["sonok", "snook", "Socke"]:
 				cookies = ["Nudel", "Ketchup", "Nudel-Ketchup"]
-			elif match.group(2) in ["c143", "tse143", "tse", "c143po"]:
+			elif match.group(4) in ["c143", "tse143", "tse", "c143po"]:
 				cookies = ["Bier", "Pizza", "Kartoffel", "Tofu",
 						"Salat", "Imaginären"]
-			elif match.group(2) in ["arcardy@webchat", "arcardy"]:
+			elif match.group(4) in ["arcardy@webchat", "arcardy"]:
 				cookies = ["Closed-Recipe", "MSSQL", "Windows",
 						"Plastik", "Python"]
 			if not match.group(1) is None:
@@ -65,7 +65,7 @@ class Cookies(Module):
 				cookie = [x[0].upper() + x[1:].lower() \
 						for x in cookie]
 				cookies = [ "-".join(cookie) ]
-			if match.group(3) == '?':
+			if match.group(5) == '?':
 				return 'nein!'
 		elif not msg.lower() in ['keks', 'keks?', 'keks!']:
 			return False
