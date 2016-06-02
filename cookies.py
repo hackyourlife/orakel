@@ -58,6 +58,8 @@ class Cookies(Module):
 			elif match.group(4) in ["arcardy@webchat", "arcardy"]:
 				cookies = ["Closed-Recipe", "MSSQL", "Windows",
 						"Plastik", "Python"]
+			elif match.group(4) == "mich":
+				users = [ nick ]
 			if not match.group(1) is None:
 				if match.group(1)[-1] == '-':
 					cookie = match.group(1)[:-1].split('-')
