@@ -162,7 +162,7 @@ class Module(object):
 
 	def do_log(self, msg, severity='INFO', module=None):
 		if module is None:
-			module = __name__
+			module = self.name
 		self.send(messaging.ROUTING_KEY_LOG,
 				{'severity': severity, 'module': module,
 					'msg': msg})
