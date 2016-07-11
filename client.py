@@ -6,6 +6,9 @@ from sleekxmpp.xmlstream import ET
 from time import time
 import logging
 
+from Crypto.Cipher import AES
+from Crypto import Random
+import base64
 
 class Client(sleekxmpp.ClientXMPP):
 	mention_listeners = []
@@ -16,12 +19,23 @@ class Client(sleekxmpp.ClientXMPP):
 	init_complete_listeners = []
 	participants = {}
 
-	def __init__(self, jid, password, room, nick, log=None):
+	def __init__(self, jid, password, room, nick, key=None, log=None):
 		sleekxmpp.ClientXMPP.__init__(self, jid, password)
 
 		self.room = room
 		self.nick = nick
 		self.online = False
+
+		if key is None:
+			self.encrypt = False
+			self.key = None
+		else:
+			self.encrypt = True
+			self.key = key.encode('utf-8')
+
+			# apply padding
+			length = 32 - (len(self.key) % 32)
+			self.key += bytes([length]) * length
 
 		if not log is None:
 			self.log = log
@@ -36,6 +50,23 @@ class Client(sleekxmpp.ClientXMPP):
 				self.muc_online)
 		self.add_event_handler("muc::%s::got_offline" % self.room,
 				self.muc_offline)
+
+	def encode(self, msg):
+		data = msg.encode('utf-8')
+		iv = Random.new().read(AES.block_size)
+		aes = AES.new(self.key, AES.MODE_CBC, iv)
+		length = 16 - (len(data) % 16)
+		data += bytes([length]) * length
+		enc = aes.encrypt(data)
+		return base64.b64encode(iv + enc).decode('ascii')
+
+	def decode(self, msg):
+		raw = base64.b64decode(msg)
+		iv = raw[0:AES.block_size]
+		msg = raw[AES.block_size:]
+		aes = AES.new(self.key, AES.MODE_CBC, iv)
+		data = aes.decrypt(msg)
+		return data[:-data[-1]].decode('utf-8')
 
 	def add_mention_listener(self, listener):
 		self.mention_listeners += [ listener ]
@@ -83,17 +114,30 @@ class Client(sleekxmpp.ClientXMPP):
 				return
 			if len(msg['body']) == 0:
 				return
-			if msg['body'].startswith(self.nick):
-				if len(msg['body']) <= len(self.nick) + 2:
-					return
-				text = msg['body'][len(self.nick) + 1:].strip()
+			body = msg['body']
+			if self.key is not None:
+				try:
+					XHTML_NS = 'http://www.w3.org/1999/xhtml'
+					span = msg['html'].find('.//{%s}span[@data]' %
+							XHTML_NS)
+					if span is not None:
+						data = span.attrib.get('data')
+						body = self.decode(data)
+				except Exception as e:
+					self.log.warn("exception while " \
+							"decoding lima gold: " \
+							"%s" % e)
+			if body.startswith("%s:" % self.nick) or \
+					body.startswith("%s " % self.nick) \
+					and len(body) > len(self.nick) + 2:
+				text = body[len(self.nick) + 1:].strip()
 				for listener in self.mention_listeners:
 					listener(msg=text, nick=nick, jid=jid,
 							role=role,
 							affiliation=affiliation)
 			else:
 				for listener in self.message_listeners:
-					listener(msg=msg['body'], nick=nick,
+					listener(msg=body, nick=nick,
 							jid=jid, role=role,
 							affiliation=affiliation)
 
@@ -147,6 +191,20 @@ class Client(sleekxmpp.ClientXMPP):
 	def muc_send(self, msg):
 		sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
 				mbody=msg, mtype='groupchat')
+
+	def muc_send_encrypted(self, msg):
+		if self.encrypt and self.key is not None:
+			plain = '[Diese Nachricht ist nur für ' \
+					'Lima-Gold-Mitglieder ' \
+					'lesbar. Mehr auf lima-city.de/gold]'
+			html = '<span data="%s">%s</span>' % (self.encode(msg),
+					plain)
+			sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
+					mbody=plain, mhtml=html,
+					mtype='groupchat')
+		else:
+			sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
+					mbody=msg, mtype='groupchat')
 
 	def msg_send(self, to, msg, muc):
 		jid = to

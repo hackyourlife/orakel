@@ -153,8 +153,12 @@ if __name__ == "__main__":
 	password = config.get("xmpp", "password")
 	room = config.get("xmpp", "room")
 	nick = config.get("xmpp", "nick")
+	key = None
+	try:
+		key = config.get("xmpp", "key")
+	except: pass
 
-	xmpp = Client(jid, password, room, nick, log=log)
+	xmpp = Client(jid, password, room, nick, key=key, log=log)
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
