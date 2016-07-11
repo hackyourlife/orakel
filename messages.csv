@@ -36,6 +36,8 @@ download;https://www.lima-city.de/hilfe/was-ist-der-download-server
 traffic;https://www.lima-city.de/hilfe/wie-viel-traffic-habe-ich
 auktion;https://www.lima-city.de/auctions
 auktionen;https://www.lima-city.de/auctions
+auction;https://www.lima-city.de/auctions
+auctions;https://www.lima-city.de/auctions
 ticket;https://www.lima-city.de/usercp/tickets/
 tickets;https://www.lima-city.de/usercp/tickets/
 talkr;https://jabber.lima-city.de/
