@@ -6,9 +6,13 @@ from sleekxmpp.xmlstream import ET
 from time import time
 import logging
 
+import encryptim
+
 from Crypto.Cipher import AES
 from Crypto import Random
 import base64
+
+encryptim.register()
 
 class Client(sleekxmpp.ClientXMPP):
 	mention_listeners = []
@@ -112,9 +116,20 @@ class Client(sleekxmpp.ClientXMPP):
 		if nick != self.nick:
 			if not self.online:
 				return
-			if len(msg['body']) == 0:
-				return
 			body = msg['body']
+			stealth = False
+			if len(msg['encrypted']['content']) != 0:
+				if self.key is None:
+					return
+				data = msg['encrypted']['content']
+				try:
+					body = self.decode(data)
+					stealth = True
+				except Exception as e:
+					self.log.warn("exception while " \
+							"decoding: %s" % e)
+			if len(body) == 0:
+				return
 			if self.key is not None:
 				try:
 					XHTML_NS = 'http://www.w3.org/1999/xhtml'
@@ -134,12 +149,14 @@ class Client(sleekxmpp.ClientXMPP):
 				for listener in self.mention_listeners:
 					listener(msg=text, nick=nick, jid=jid,
 							role=role,
-							affiliation=affiliation)
+							affiliation=affiliation,
+							stealth=stealth)
 			else:
 				for listener in self.message_listeners:
 					listener(msg=body, nick=nick,
 							jid=jid, role=role,
-							affiliation=affiliation)
+							affiliation=affiliation,
+							stealth=stealth)
 
 	def message(self, msg):
 		if msg['type'] in ('chat', 'normal'):
@@ -205,6 +222,12 @@ class Client(sleekxmpp.ClientXMPP):
 		else:
 			sleekxmpp.ClientXMPP.send_message(self, mto=self.room,
 					mbody=msg, mtype='groupchat')
+
+	def muc_send_stealth(self, msg):
+		message = self.Message(sto=self.room, stype='groupchat',
+				sfrom=None)
+		message['encrypted']['content'] = self.encode(msg)
+		message.send()
 
 	def msg_send(self, to, msg, muc):
 		jid = to

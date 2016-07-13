@@ -162,14 +162,17 @@ if __name__ == "__main__":
 	xmpp.register_plugin('xep_0030') # Service Discovery
 	xmpp.register_plugin('xep_0045') # Multi-User Chat
 	xmpp.register_plugin('xep_0199') # XMPP Ping
+	xmpp.register_plugin("encrypt-im") # encrypted stealth MUC
 
-	def muc_msg(msg, nick, jid, role, affiliation):
+	def muc_msg(msg, nick, jid, role, affiliation, stealth):
 		send(ROUTING_KEY_MUC, {'nick': nick, 'jid': jid, 'role': role,
-			'affiliation': affiliation, 'msg': msg})
+			'affiliation': affiliation, 'msg': msg,
+			'stealth': stealth})
 
-	def muc_mention(msg, nick, jid, role, affiliation):
+	def muc_mention(msg, nick, jid, role, affiliation, stealth):
 		send(ROUTING_KEY_MUC_MENTION, {'nick': nick, 'jid': jid, 'role':
-			role, 'affiliation': affiliation, 'msg': msg})
+			role, 'affiliation': affiliation, 'msg': msg,
+			'stealth': stealth})
 
 	def priv_msg(msg, jid):
 		send(ROUTING_KEY_PRIVMSG, {'jid': jid, 'msg': msg})
