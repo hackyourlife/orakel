@@ -17,15 +17,14 @@ class Lutcha(Module):
 
 	def handle(self, msg):
 		parts = msg.split(' ', 2)
-		cmd = parts[0].lower()
+		cmd = parts[0].lower()[1:]
 		url = "https://luchta.de"
-		if cmd == "bash":
-			url += "/bash"
-		if len(parts) == 3 and parts[1][0] == "-":
+		prefix = "bash " if cmd == "bash" else ""
+		if len(parts) == 3 and len(parts[1]) > 0 and parts[1][0] == "-":
 			return "%s/%s/%s" % (url,
 					urlencode(parts[1].lstrip("-")),
-					urlencode(parts[2]))
+					urlencode(prefix + parts[2]))
 		elif len(parts) > 1:
-			return "%s/%s" % (url, urlencode(" ".join(parts[1:])))
+			return "%s/%s" % (url, urlencode(prefix + " ".join(parts[1:])))
 		else:
 			return
