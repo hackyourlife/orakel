@@ -10,7 +10,6 @@ class Lutcha(Module):
 
 	def muc_msg(self, msg, **keywords):
 		parts = msg.split(' ', 1)
-		self.log.info("DEBUG> recevied message from: %s" % (msg))
 		if len(parts) == 2 and parts[0][0] == "!" and parts[0][1:].lower() in ["bash", "doc", "lutcha"]:
 			result = self.handle(msg)
 			if result:
