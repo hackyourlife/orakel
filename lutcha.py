@@ -18,7 +18,7 @@ class Lutcha(Module):
 
 	def handle(self, msg, cmd):
 		parts = msg.strip().split(' ', 1)
-		url = "https://luchta.de"
+		url = "https://lutcha.de"
 		prefix = "bash " if cmd == "bash" else ""
 		if len(parts) == 2 and parts[0][0] == "-":
 			return "%s/%s/%s" % (url,
