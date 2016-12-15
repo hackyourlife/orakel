@@ -25,7 +25,7 @@ class Lutcha(Module):
 					urlencode(parts[0].lstrip("-")),
 					urlencode(prefix + parts[1].strip()))
 		elif len(parts) == 1:
-			return "%s/%s" % (url, urlencode(prefix +
-				" ".join(parts[0])))
+			return "%s/%s" % (url, urlencode(prefix + msg.strip()))
 		else:
-			return
+			return "%s/%s" % (url, urlencode(prefix +
+					" ".join(parts)))
