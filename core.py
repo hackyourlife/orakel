@@ -11,7 +11,6 @@ from search import Search
 from pingpong import PingPong
 from flooding import Flooding
 from cli import CLI
-from lutcha import Lutcha
 
 class Core(Module):
 	def __init__(self, questions, search_engines, storage, maxlength,
@@ -22,7 +21,6 @@ class Core(Module):
 		self.search = Search(search_engines, parent=self)
 		self.pingpong = PingPong(parent=self)
 		self.flooding = Flooding(maxlength, paste, parent=self)
-		self.lutcha = Lutcha(parent=self)
 		self.cli = CLI(parent=self)
 		self.log.info("load complete")
 

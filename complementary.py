@@ -10,12 +10,14 @@ from cookies import Cookies
 from dice import Dice
 from masochist import Masochist
 from online import Online
+from lutcha import Lutcha
 
 class Complementary(Module):
 	def __init__(self, search_engines):
 		super(Complementary, self).__init__(name="complementary")
 		self.scripting = Scripting(search_engines, parent=self)
 		self.cookies = Cookies(parent=self)
+		self.lutcha = Lutcha(parent=self)
 		self.dice = Dice(parent=self)
 		self.masochist = Masochist(parent=self)
 		self.online = Online(parent=self)
