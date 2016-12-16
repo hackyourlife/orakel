@@ -12,15 +12,18 @@ class Lutcha(Module):
 		parts = msg.strip().split(' ', 1)
 		if len(parts) == 2 and parts[0][0] == "!" and \
 				parts[0][1:].lower() in ["bash", "doc", "lutcha"]:
-			result = self.handle(parts[1], parts[0][1:].lower())
+			result = self.handle(parts[0][1:].lower(), parts[1])
 			if result:
 				self.send_muc(result)
 
-	def handle(self, msg, cmd):
+	def handle(self, cmd, msg):
 		parts = msg.strip().split(' ', 1)
 		url = "https://lutcha.de"
 		prefix = "bash " if cmd == "bash" else ""
 		if len(parts) == 2 and parts[0][0] == "-":
+			if parts[0] == "--":
+				return "%s/%s" % (url,
+						urlencode(parts[1].strip()))
 			return "%s/%s/%s" % (url,
 					urlencode(parts[0].lstrip("-")),
 					urlencode(prefix + parts[1].strip()))
