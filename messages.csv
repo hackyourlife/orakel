@@ -47,6 +47,9 @@ webchat;https://jabber.lima-city.de/
 jabber;https://www.lima-city.de/hilfe/jabber
 rm;https://www.lima-city.de/usercp/delete-account
 delete;https://www.lima-city.de/usercp/page%3Adelete
+ts3;https://www.lima-city.de/hilfe/teamspeak-server-domain
+ts;https://www.lima-city.de/hilfe/teamspeak-server-domain
+teamspeak;https://www.lima-city.de/hilfe/teamspeak-server-domain
 phpinfo;http://system.lima-city.de/info.php
 paste;http://paste42.de/
 status;http://lima-status.de/
