@@ -78,9 +78,9 @@ def tagometer():
 def tagometer_view(length=50):
 	size = 50 if length > 50 else abs(length)
 	percent = tagometer()
-	loaded = int(percent / 100 * size)
+	loaded = round(percent / 100 * size)
 	toload = size - loaded
-	text = "[%s%s] %0.2f%%" % ("#" * loaded, " " * toload, percent)
+	text = "[%s%s] %0.3f%%" % ("#" * loaded, " " * toload, percent)
 	return percent if length == 0 else text[::-1] if length < 0 else text
 
 def ping(address):
