@@ -27,6 +27,7 @@ for attr in (a for a in dir(module) if not a.startswith('_')):
 
 import datetime
 from time import time as unixtime
+from time import strftime
 import uuid as guid
 
 _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -69,6 +70,18 @@ def utcnow():
 
 def now():
 	return datetime.datetime.now()
+
+def tagometer():
+	return (int(strftime("%H")) * 3600 + int(strftime("%M")) * 60 +
+		int(strftime("%S"))) / (24 * 36)
+
+def tagometer_view(length=50):
+	size = 50 if length > 50 else abs(length)
+	percent = tagometer()
+	loaded = int(percent / 100 * size)
+	toload = size - loaded
+	text = "[%s%s] %0.2f%%" % ("#" * loaded, " " * toload, percent)
+	return percent if length == 0 else text[::-1] if length < 0 else text
 
 def ping(address):
 	return icmplib.ping(address)
@@ -274,7 +287,9 @@ class Scripting(Module):
 			"dnsquery": dnsquery,
 			"random": random.random,
 			"randrange": random.randrange,
-			"oneof": oneof
+			"oneof": oneof,
+			"tagometer": tagometer_view,
+			"strftime": strftime
 	}
 
 	def __init__(self, search_engine_file=None, **keywords):
