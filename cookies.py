@@ -70,6 +70,8 @@ class Cookies(Module):
 				cookies = [ "-".join(cookie) ]
 			if match.group(5) == '?':
 				return 'nein!'
+			elif cookies[0] == "subway" and match.group(4) == "matze":
+				return "matze bekommt keine Kekse von Subway mehr!"
 		elif not msg.lower() in ['keks', 'keks!', 'cookie', 'cookie!']:
 			return False
 
