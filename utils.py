@@ -6,8 +6,11 @@ from random import SystemRandom
 def randrange(*args):
 	return SystemRandom().randrange(*args)
 
-def oneof(values):
-	return SystemRandom().choice(values)
+def oneof(values, *args):
+	if len(args) == 0:
+		return SystemRandom().choice(values)
+	else:
+		return SystemRandom().choice([values] + list(args))
 
 def startswith(a, b):
 	if len(b) > len(a):
