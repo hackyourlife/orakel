@@ -38,9 +38,12 @@ class Module(object):
 		self.connection, self.exchange = messaging.open_connection()
 		self.channel = self.connection.channel()
 		self.channel.exchange_declare(exchange=self.exchange,
-				type="direct")
+				exchange_type="direct")
+		self.send_channel = self.connection.channel()
+		self.send_channel.exchange_declare(exchange=self.exchange,
+				exchange_type="direct")
 
-		self.sender = Sender(self.channel, self.exchange)
+		self.sender = Sender(self.send_channel, self.exchange)
 
 		if len(topics) == 0:
 			return

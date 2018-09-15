@@ -76,12 +76,12 @@ if __name__ == "__main__":
 
 	connection, exchange = open_connection()
 	channel = connection.channel()
-	channel.exchange_declare(exchange=exchange, type="direct")
+	channel.exchange_declare(exchange=exchange, exchange_type="direct")
 
 	## ugly workaround because pika does not like multiple threads
-	#send_connection, exchange = open_connection()
-	#send_channel = send_connection.channel()
-	sender = Sender(channel, exchange)
+	send_connection, exchange = open_connection()
+	send_channel = send_connection.channel()
+	sender = Sender(send_channel, exchange)
 	sender.start()
 
 	def send(key, data):

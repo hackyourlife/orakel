@@ -9,7 +9,7 @@ from messaging import open_connection, ROUTING_KEY_SENDMUC
 if __name__ == "__main__":
 	connection, exchange = open_connection()
 	channel = connection.channel()
-	channel.exchange_declare(exchange=exchange, type="direct")
+	channel.exchange_declare(exchange=exchange, exchange_type="direct")
 
 	result = channel.queue_declare(exclusive=True)
 	queue_name = result.method.queue
